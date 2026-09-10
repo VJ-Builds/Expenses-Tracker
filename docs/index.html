@@ -289,7 +289,7 @@
       </div>
     </div>
 
-    <a href="expenseiq://login" class="btn-open" id="appBtn">Open ExpenseIQ App</a>
+    <a href="expenseiq://verified" class="btn-open" id="appBtn">Open ExpenseIQ App</a>
 
     <div class="status-text" id="statusMsg"></div>
 
@@ -301,11 +301,18 @@
     window.addEventListener('DOMContentLoaded', function() {
       var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       var status = document.getElementById('statusMsg');
+      var hash = window.location.hash || '';
+      var deepLink = "expenseiq://verified" + hash;
+
+      var appBtn = document.getElementById('appBtn');
+      if (appBtn) {
+        appBtn.setAttribute('href', deepLink);
+      }
 
       if (isMobile) {
         status.textContent = "Opening ExpenseIQ...";
         setTimeout(function() {
-          window.location.href = "expenseiq://login";
+          window.location.href = deepLink;
         }, 1100);
       }
     });

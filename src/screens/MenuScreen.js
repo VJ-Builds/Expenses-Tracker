@@ -32,14 +32,53 @@ const MenuRow = ({ icon: Icon, iconColor, label, onPress, rightElement }) => (
 );
 
 export default function MenuScreen() {
-  const { user, logout } = useAuth();
+  const { user, logout, resendVerification, checkVerificationStatus } = useAuth();
   const navigation = useNavigation();
   const [syncing, setSyncing] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [checking, setChecking] = useState(false);
   const [expenseCount, setExpenseCount] = useState(0);
 
   const initials = user?.username
     ? user.username.substring(0, 2).toUpperCase()
     : 'JD';
+
+  const handleResendVerification = async () => {
+    if (resending || !user?.email) return;
+    setResending(true);
+    try {
+      await resendVerification(user.email);
+      Alert.alert('Verification Email Sent! ✉️', `A fresh confirmation link has been sent to ${user.email}.`);
+    } catch (e) {
+      Alert.alert('Notice', e.message || 'Could not resend verification email.');
+    } finally {
+      setResending(false);
+    }
+  };
+
+  const handleCheckStatus = async () => {
+    if (checking) return;
+    setChecking(true);
+    try {
+      const res = await checkVerificationStatus(true);
+      if (res.verified) {
+        Alert.alert('Email Verified! 🎉', 'Your account is verified and data has been synced to cloud.');
+      } else if (res.pending) {
+        Alert.alert('Verification Pending ✉️', `The verification link sent to ${user?.email} has not been clicked yet. Please click the link in your email and tap Check again.`);
+      } else if (res.needsPassword) {
+        Alert.alert(
+          'Connect Cloud Sync',
+          'Please pull down to refresh on Dashboard to connect cloud backup with your password.'
+        );
+      } else if (res.error) {
+        Alert.alert('Notice', res.error);
+      }
+    } catch (e) {
+      Alert.alert('Notice', e.message);
+    } finally {
+      setChecking(false);
+    }
+  };
 
   const loadStats = () => {
     try {
@@ -100,8 +139,47 @@ export default function MenuScreen() {
           <View style={{ flex: 1 }}>
             <Text style={styles.profileName}>{user?.username || 'John Doe'}</Text>
             <Text style={styles.profileEmail}>{user?.email || 'user@example.com'}</Text>
+            <View style={styles.badgeRow}>
+              {user?.is_verified ? (
+                <View style={[styles.statusBadge, styles.statusBadgeVerified]}>
+                  <Text style={styles.statusBadgeTextVerified}>✓ Verified</Text>
+                </View>
+              ) : (
+                <View style={[styles.statusBadge, styles.statusBadgePending]}>
+                  <Text style={styles.statusBadgeTextPending}>⏳ Verification Pending</Text>
+                </View>
+              )}
+            </View>
           </View>
         </View>
+
+        {/* Verification Pending Banner */}
+        {!user?.is_verified && (
+          <View style={styles.pendingCard}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.pendingCardTitle}>Confirm Your Email ✉️</Text>
+              <Text style={styles.pendingCardSub}>
+                Tap the link sent to your inbox to enable full cloud backup.
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+              <TouchableOpacity
+                style={styles.pendingCheckBtn}
+                onPress={handleCheckStatus}
+                disabled={checking}
+              >
+                <Text style={styles.pendingCheckBtnText}>{checking ? '...' : 'Check'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.pendingResendBtn}
+                onPress={handleResendVerification}
+                disabled={resending}
+              >
+                <Text style={styles.pendingResendBtnText}>{resending ? '...' : 'Resend'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
 
         {/* Menu Rows */}
         <View style={styles.section}>
@@ -205,6 +283,44 @@ const styles = StyleSheet.create({
   avatarText: { fontFamily: FONTS.bold, fontSize: FONTS.sizes.xl, color: '#FFF' },
   profileName: { fontFamily: FONTS.bold, fontSize: FONTS.sizes.lg, color: TEXT_DARK },
   profileEmail: { fontFamily: FONTS.medium, fontSize: FONTS.sizes.sm, color: TEXT_MUTED, marginTop: 3 },
+  badgeRow: { flexDirection: 'row', marginTop: 6 },
+  statusBadge: {
+    paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999,
+    alignSelf: 'flex-start',
+  },
+  statusBadgeVerified: { backgroundColor: '#DCFCE7' },
+  statusBadgeTextVerified: { fontFamily: FONTS.semiBold, fontSize: 11, color: '#15803D' },
+  statusBadgePending: { backgroundColor: '#FEF3C7' },
+  statusBadgeTextPending: { fontFamily: FONTS.semiBold, fontSize: 11, color: '#B45309' },
+
+  pendingCard: {
+    backgroundColor: '#FFFBEB',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    borderRadius: RADIUS.xl,
+    padding: 16,
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    ...SHADOWS.card,
+  },
+  pendingCardTitle: { fontFamily: FONTS.bold, fontSize: FONTS.sizes.sm, color: '#B45309' },
+  pendingCardSub: { fontFamily: FONTS.regular, fontSize: 11.5, color: '#92400E', marginTop: 2 },
+  pendingCheckBtn: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: RADIUS.md,
+  },
+  pendingCheckBtnText: { fontFamily: FONTS.bold, fontSize: 12, color: '#FFF' },
+  pendingResendBtn: {
+    backgroundColor: '#D97706',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: RADIUS.md,
+  },
+  pendingResendBtnText: { fontFamily: FONTS.bold, fontSize: 12, color: '#FFF' },
 
   section: {
     backgroundColor: '#FFF', borderRadius: RADIUS.xl,

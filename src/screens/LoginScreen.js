@@ -14,7 +14,7 @@ import { verifyPassword } from '../utils/authHelpers';
 import { supabase } from '../config/supabase';
 
 export default function LoginScreen({ navigation, route }) {
-  const { login } = useAuth();
+  const { login, loginLocally, resendVerification } = useAuth();
   const [email, setEmail]       = useState(route?.params?.email || '');
   const [password, setPassword] = useState('');
   const [loading, setLoading]   = useState(false);
@@ -43,34 +43,56 @@ export default function LoginScreen({ navigation, route }) {
     setLoading(true);
     try {
       await login(email.toLowerCase().trim(), password);
-      // AuthContext will handle the local user sync and navigation automatically
     } catch (err) {
       if (err.message && (err.message.toLowerCase().includes('email not confirmed') || err.message.toLowerCase().includes('not confirmed'))) {
-        Alert.alert(
-          'Email Verification Required ✉️',
-          'Please open your email inbox and tap the confirmation link to activate your account.\n\nNeed a new link?',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'Resend Link',
-              onPress: async () => {
-                try {
-                  const { error } = await supabase.auth.resend({
-                    type: 'signup',
-                    email: email.toLowerCase().trim(),
-                    options: {
-                      emailRedirectTo: 'https://vijaypal-7.github.io/Expenses-Tracker/',
-                    },
-                  });
-                  if (error) throw error;
-                  Alert.alert('Email Sent! ✉️', 'A fresh confirmation link has been sent to your email.');
-                } catch (resendErr) {
-                  Alert.alert('Notice', resendErr.message || 'Could not resend email.');
-                }
+        const cleanEmail = email.toLowerCase().trim();
+        const localUser = getUserByEmail(cleanEmail);
+
+        if (localUser) {
+          Alert.alert(
+            'Verification Pending ✉️',
+            'Your email is not verified yet. Would you like to enter the app now with pending status, or resend the confirmation link?',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Resend Link',
+                onPress: async () => {
+                  try {
+                    await resendVerification(cleanEmail);
+                    Alert.alert('Email Sent! ✉️', 'A fresh confirmation link has been sent to your email.');
+                  } catch (resendErr) {
+                    Alert.alert('Notice', resendErr.message || 'Could not resend email.');
+                  }
+                },
               },
-            },
-          ]
-        );
+              {
+                text: 'Open App',
+                onPress: async () => {
+                  await loginLocally(localUser);
+                },
+              },
+            ]
+          );
+        } else {
+          Alert.alert(
+            'Email Verification Required ✉️',
+            'Please open your email inbox and tap the confirmation link to activate your account.\n\nNeed a new link?',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Resend Link',
+                onPress: async () => {
+                  try {
+                    await resendVerification(cleanEmail);
+                    Alert.alert('Email Sent! ✉️', 'A fresh confirmation link has been sent to your email.');
+                  } catch (resendErr) {
+                    Alert.alert('Notice', resendErr.message || 'Could not resend email.');
+                  }
+                },
+              },
+            ]
+          );
+        }
       } else if (err.message.includes('Invalid login credentials')) {
         setErrors({ email: 'Invalid login credentials' });
       } else {

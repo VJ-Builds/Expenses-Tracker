@@ -23,6 +23,11 @@ export const getUserByEmail = (email) => {
   );
 };
 
+export const setUserVerified = (userId, isVerified = 1) => {
+  const db = getDb();
+  db.runSync('UPDATE users SET is_verified = ? WHERE id = ?;', [isVerified ? 1 : 0, userId]);
+};
+
 // ═══════════════════════════════════════════════════════════════
 //  EXPENSE QUERIES
 // ═══════════════════════════════════════════════════════════════

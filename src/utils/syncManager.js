@@ -97,7 +97,20 @@ export const syncUp = async (user) => {
   }
   
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    let { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) {
+      const pendingRaw = await AsyncStorage.getItem('@expenses_pending_auth');
+      if (pendingRaw) {
+        try {
+          const { email, password } = JSON.parse(pendingRaw);
+          const signInRes = await supabase.auth.signInWithPassword({ email, password });
+          if (signInRes.data?.session) {
+            session = signInRes.data.session;
+            await AsyncStorage.removeItem('@expenses_pending_auth');
+          }
+        } catch (e) {}
+      }
+    }
     if (!session?.user) return { success: false, message: 'Not authenticated with cloud' };
     
     const payload = getExportPayload(user);
@@ -131,7 +144,20 @@ export const syncDown = async (user) => {
   if (!state.isConnected) return { success: false, message: 'Offline' };
   
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    let { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) {
+      const pendingRaw = await AsyncStorage.getItem('@expenses_pending_auth');
+      if (pendingRaw) {
+        try {
+          const { email, password } = JSON.parse(pendingRaw);
+          const signInRes = await supabase.auth.signInWithPassword({ email, password });
+          if (signInRes.data?.session) {
+            session = signInRes.data.session;
+            await AsyncStorage.removeItem('@expenses_pending_auth');
+          }
+        } catch (e) {}
+      }
+    }
     if (!session?.user) return { success: false, message: 'Not authenticated with cloud' };
     
     const { data, error } = await executeWithClockSkewRetry(async () => {

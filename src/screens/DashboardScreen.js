@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, RefreshControl, LayoutAnimation, Platform, Animated as RNAnimated, Modal, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Dimensions, RefreshControl, LayoutAnimation, Platform, Animated as RNAnimated, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing, FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -36,7 +36,77 @@ const generateMonthOptions = () => {
 };
 
 export default function DashboardScreen({ navigation }) {
-  const { user } = useAuth();
+  const { user, resendVerification, checkVerificationStatus } = useAuth();
+  const [resending, setResending] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [verifyModalVisible, setVerifyModalVisible] = useState(false);
+  const [verifyPassword, setVerifyPassword] = useState('');
+  const [verifyError, setVerifyError] = useState('');
+  const [verifyingPass, setVerifyingPass] = useState(false);
+
+  const handleResendPendingVerification = async () => {
+    if (resending || !user?.email) return;
+    setResending(true);
+    try {
+      await resendVerification(user.email);
+      Alert.alert('Verification Sent! ✉️', `A confirmation link has been sent to ${user.email}.`);
+    } catch (e) {
+      Alert.alert('Notice', e.message || 'Could not resend email.');
+    } finally {
+      setResending(false);
+    }
+  };
+
+  const handleCheckVerification = async () => {
+    if (checking) return;
+    setChecking(true);
+    try {
+      const res = await checkVerificationStatus(true);
+      if (res.verified) {
+        Alert.alert('Email Verified! 🎉', 'Your account is verified and data has been synced to cloud!');
+        loadData();
+      } else if (res.needsPassword) {
+        setVerifyModalVisible(true);
+      } else if (res.pending) {
+        Alert.alert(
+          'Verification Pending ✉️',
+          `We checked Supabase, but the link in your email (${user?.email}) has not been clicked yet.\n\nPlease open Gmail, tap "Confirm email address", and then tap Check again.`
+        );
+      } else if (res.error) {
+        Alert.alert('Notice', res.error);
+      }
+    } catch (e) {
+      Alert.alert('Notice', e.message);
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  const handleConfirmPasswordVerification = async () => {
+    if (!verifyPassword.trim()) {
+      setVerifyError('Please enter your password.');
+      return;
+    }
+    setVerifyingPass(true);
+    setVerifyError('');
+    try {
+      const res = await checkVerificationStatus(true, verifyPassword);
+      if (res.verified) {
+        setVerifyModalVisible(false);
+        setVerifyPassword('');
+        Alert.alert('Success! 🎉', 'Your email is verified and your data has been saved to Supabase!');
+        loadData();
+      } else if (res.pending) {
+        setVerifyError('Email not clicked yet in Gmail. Please click the link first.');
+      } else {
+        setVerifyError(res.error || 'Incorrect password or verification failed.');
+      }
+    } catch (err) {
+      setVerifyError(err.message || 'Verification error.');
+    } finally {
+      setVerifyingPass(false);
+    }
+  };
 
   // Data state
   const [selectedMonth, setSelectedMonth] = useState(generateMonthOptions()[0].value);
@@ -198,6 +268,14 @@ export default function DashboardScreen({ navigation }) {
   const onRefresh = async () => {
     setRefreshing(true);
     try {
+      if (user && !user.is_verified) {
+        const res = await checkVerificationStatus(false);
+        if (res.verified) {
+          Alert.alert('Email Verified! 🎉', 'Your email is confirmed and data has been saved to Supabase!');
+        } else if (res.needsPassword) {
+          setVerifyModalVisible(true);
+        }
+      }
       if (user) await syncUp(user);
     } catch (e) {
       console.log('Refresh sync error:', e);
@@ -225,6 +303,34 @@ export default function DashboardScreen({ navigation }) {
         onScrollBeginDrag={() => setMonthDropOpen(false)}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
+
+        {/* Verification Pending Banner */}
+        {user && !user.is_verified ? (
+          <View style={styles.verificationBanner}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.verificationBannerTitle}>✉️ Email Verification Pending</Text>
+              <Text style={styles.verificationBannerSub}>
+                Confirm your email ({user.email}) to enable cloud sync.
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+              <TouchableOpacity 
+                style={styles.verificationCheckBtn}
+                onPress={handleCheckVerification}
+                disabled={checking}
+              >
+                <Text style={styles.verificationCheckText}>{checking ? '...' : 'Check'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.verificationResendBtn}
+                onPress={handleResendPendingVerification}
+                disabled={resending}
+              >
+                <Text style={styles.verificationResendText}>{resending ? '...' : 'Resend'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : null}
 
         {/* 2. Total Expenses Card */}
         <View style={{ marginHorizontal: 20 }}>
@@ -427,6 +533,52 @@ export default function DashboardScreen({ navigation }) {
           </LinearGradient>
         </View>
       </Modal>
+
+      {/* Quick Password Verification Modal (only needed if no cached password exists) */}
+      <Modal
+        visible={verifyModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setVerifyModalVisible(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setVerifyModalVisible(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalBox}>
+                <Text style={styles.modalTitle}>Connect Cloud Sync 🔐</Text>
+                <Text style={styles.modalSub}>
+                  Email verified in Gmail? Enter your password once to connect cloud backup for {user?.email}.
+                </Text>
+                <TextInput
+                  style={styles.modalInput}
+                  placeholder="Enter your password"
+                  placeholderTextColor="#8F92A1"
+                  secureTextEntry={true}
+                  value={verifyPassword}
+                  onChangeText={setVerifyPassword}
+                  autoCapitalize="none"
+                />
+                {verifyError ? <Text style={styles.modalErrorText}>{verifyError}</Text> : null}
+                <View style={styles.modalBtnRow}>
+                  <TouchableOpacity
+                    style={styles.modalCancelBtn}
+                    onPress={() => { setVerifyModalVisible(false); setVerifyError(''); }}
+                  >
+                    <Text style={styles.modalCancelText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalConfirmBtn}
+                    onPress={handleConfirmPasswordVerification}
+                    disabled={verifyingPass}
+                  >
+                    <Text style={styles.modalConfirmText}>{verifyingPass ? 'Verifying...' : 'Verify & Sync'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 }
@@ -453,6 +605,60 @@ const styles = StyleSheet.create({
   iconBtn: { padding: 4 },
 
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+
+  verificationBanner: {
+    marginHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 4,
+    backgroundColor: '#FFFBEB',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    borderRadius: 16,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    ...softShadow,
+  },
+  verificationBannerTitle: { fontFamily: FONTS.bold, fontSize: 13, color: '#B45309' },
+  verificationBannerSub: { fontFamily: FONTS.regular, fontSize: 11, color: '#92400E', marginTop: 2 },
+  verificationCheckBtn: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 10,
+  },
+  verificationCheckText: { fontFamily: FONTS.bold, fontSize: 12, color: '#FFF' },
+  verificationResendBtn: {
+    backgroundColor: '#D97706',
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 10,
+  },
+  verificationResendText: { fontFamily: FONTS.bold, fontSize: 12, color: '#FFF' },
+
+  modalOverlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center', alignItems: 'center', padding: 24,
+  },
+  modalBox: {
+    width: '100%', maxWidth: 360, backgroundColor: '#FFFFFF',
+    borderRadius: 24, padding: 24, ...softShadow,
+  },
+  modalTitle: { fontFamily: FONTS.bold, fontSize: 18, color: TEXT_DARK, marginBottom: 8 },
+  modalSub: { fontFamily: FONTS.regular, fontSize: 13, color: TEXT_MUTED, lineHeight: 18, marginBottom: 16 },
+  modalInput: {
+    borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 12,
+    paddingHorizontal: 14, paddingVertical: 10, fontSize: 14,
+    fontFamily: FONTS.medium, color: TEXT_DARK, backgroundColor: '#F8FAFC',
+    marginBottom: 8,
+  },
+  modalErrorText: { fontFamily: FONTS.medium, fontSize: 12, color: '#EF4444', marginBottom: 10 },
+  modalBtnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10, marginTop: 12 },
+  modalCancelBtn: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10 },
+  modalCancelText: { fontFamily: FONTS.medium, fontSize: 14, color: TEXT_MUTED },
+  modalConfirmBtn: { backgroundColor: BRAND_PURPLE, paddingVertical: 10, paddingHorizontal: 18, borderRadius: 10 },
+  modalConfirmText: { fontFamily: FONTS.bold, fontSize: 14, color: '#FFFFFF' },
 
   // Total Expenses Card
   totalCard: {

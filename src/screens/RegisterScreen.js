@@ -65,16 +65,8 @@ export default function RegisterScreen({ navigation }) {
     if (!validate()) return;
     setLoading(true);
     try {
-      const data = await register(email.toLowerCase().trim(), password, username.trim());
-      // AuthContext will handle local SQLite creation/linking via onAuthStateChange IF it logs in immediately.
-      // But if email confirmation is required, session will be null.
-      if (!data?.session) {
-        Alert.alert(
-          'Registration Successful! 🎉', 
-          'Please check your email to verify your account before logging in.',
-          [{ text: 'OK', onPress: () => navigation.navigate('Login', { email: email.toLowerCase().trim() }) }]
-        );
-      }
+      await register(email.toLowerCase().trim(), password, username.trim());
+      // AuthContext directly sets `user` with pending status, so AppNavigator automatically navigates to Dashboard!
     } catch (err) {
       if (err.message && err.message.toLowerCase().includes('already registered')) {
         setErrors({ email: 'This email is already registered online. Please log in.' });

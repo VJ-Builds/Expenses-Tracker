@@ -277,6 +277,7 @@ const linking = {
     screens: {
       Login: 'login',
       Register: 'register',
+      Main: 'verified',
     },
   },
 };
