@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, ScrollView, KeyboardAvoidingView,
-  Platform, Alert, ActivityIndicator,
+  Platform, Alert, ActivityIndicator, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -87,7 +87,11 @@ export default function RegisterScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.logoWrap}>
-            <Text style={styles.logoEmoji}>💸</Text>
+            <Image
+              source={require('../../assets/icon.png')}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
             <Text style={styles.logoTitle}>ExpenseIQ</Text>
             <Text style={styles.logoSub}>Track every rupee, every day</Text>
           </View>
@@ -215,7 +219,7 @@ const styles = StyleSheet.create({
   flex:       { flex: 1 },
   container:  { flexGrow: 1, justifyContent: 'center', padding: SPACING.lg },
   logoWrap:   { alignItems: 'center', marginBottom: SPACING.xl },
-  logoEmoji:  { fontSize: 52 },
+  logoImage:  { width: 76, height: 76, borderRadius: 18, marginBottom: 4 },
   logoTitle:  { fontFamily: FONTS.bold, fontSize: FONTS.sizes.xxl, color: COLORS.textPrimary, marginTop: SPACING.sm },
   logoSub:    { fontFamily: FONTS.regular, fontSize: FONTS.sizes.sm, color: COLORS.textSecondary, marginTop: 4 },
   card: {
