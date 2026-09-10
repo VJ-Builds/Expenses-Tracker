@@ -72,7 +72,7 @@ export default function RegisterScreen({ navigation }) {
         Alert.alert(
           'Registration Successful! 🎉', 
           'Please check your email to verify your account before logging in.',
-          [{ text: 'OK', onPress: () => navigation.navigate('Login') }]
+          [{ text: 'OK', onPress: () => navigation.navigate('Login', { email: email.toLowerCase().trim() }) }]
         );
       }
     } catch (err) {

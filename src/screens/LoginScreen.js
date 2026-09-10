@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, ScrollView, KeyboardAvoidingView,
@@ -11,15 +11,23 @@ import { getUserByEmail } from '../db/queries';
 import { useAuth } from '../context/AuthContext';
 import { verifyPassword } from '../utils/authHelpers';
 
-export default function LoginScreen({ navigation }) {
+import { supabase } from '../config/supabase';
+
+export default function LoginScreen({ navigation, route }) {
   const { login } = useAuth();
-  const [email, setEmail]       = useState('');
+  const [email, setEmail]       = useState(route?.params?.email || '');
   const [password, setPassword] = useState('');
   const [loading, setLoading]   = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [errors, setErrors]     = useState({});
 
   const passRef = useRef(null);
+
+  useEffect(() => {
+    if (route?.params?.email) {
+      setEmail(route.params.email);
+    }
+  }, [route?.params?.email]);
 
   const validate = () => {
     const e = {};
@@ -37,7 +45,33 @@ export default function LoginScreen({ navigation }) {
       await login(email.toLowerCase().trim(), password);
       // AuthContext will handle the local user sync and navigation automatically
     } catch (err) {
-      if (err.message.includes('Invalid login credentials')) {
+      if (err.message && (err.message.toLowerCase().includes('email not confirmed') || err.message.toLowerCase().includes('not confirmed'))) {
+        Alert.alert(
+          'Email Verification Required ✉️',
+          'Please open your email inbox and tap the confirmation link to activate your account.\n\nNeed a new link?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Resend Link',
+              onPress: async () => {
+                try {
+                  const { error } = await supabase.auth.resend({
+                    type: 'signup',
+                    email: email.toLowerCase().trim(),
+                    options: {
+                      emailRedirectTo: 'https://vijaypal-7.github.io/Expenses-Tracker/',
+                    },
+                  });
+                  if (error) throw error;
+                  Alert.alert('Email Sent! ✉️', 'A fresh confirmation link has been sent to your email.');
+                } catch (resendErr) {
+                  Alert.alert('Notice', resendErr.message || 'Could not resend email.');
+                }
+              },
+            },
+          ]
+        );
+      } else if (err.message.includes('Invalid login credentials')) {
         setErrors({ email: 'Invalid login credentials' });
       } else {
         Alert.alert('Login Failed', err.message);

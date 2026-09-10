@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verified — ExpenseIQ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0A0A12;
+      color: #FFFFFF;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient glowing background orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      opacity: 0.35;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 320px;
+      height: 320px;
+      background: #FF6B6B;
+      top: -80px;
+      left: -80px;
+    }
+    .orb-2 {
+      width: 360px;
+      height: 360px;
+      background: #FF8E53;
+      bottom: -100px;
+      right: -100px;
+    }
+    .orb-3 {
+      width: 240px;
+      height: 240px;
+      background: #8B5CF6;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.15;
+    }
+
+    /* Main Card */
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 460px;
+      background: rgba(22, 22, 34, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 28px;
+      padding: 44px 36px;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55),
+                  0 0 0 1px rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      animation: cardFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes cardFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Brand Logo / Badge */
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #E2E8F0;
+      margin-bottom: 32px;
+    }
+
+    .logo-badge span.gradient-text {
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Animated Success Checkmark */
+    .icon-container {
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 28px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.12);
+      border: 2px solid rgba(16, 185, 129, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 32px rgba(16, 185, 129, 0.25);
+      animation: pulseCheck 2.5s infinite ease-in-out;
+    }
+
+    @keyframes pulseCheck {
+      0%, 100% {
+        box-shadow: 0 0 28px rgba(16, 185, 129, 0.22);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 44px rgba(16, 185, 129, 0.42);
+        transform: scale(1.04);
+      }
+    }
+
+    .checkmark {
+      width: 46px;
+      height: 46px;
+      stroke: #10B981;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: drawCheck 0.9s cubic-bezier(0.65, 0, 0.45, 1) 0.25s forwards;
+    }
+
+    @keyframes drawCheck {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    /* Titles */
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #FFFFFF;
+      margin-bottom: 12px;
+      line-height: 1.25;
+    }
+
+    p.subtitle {
+      font-size: 15px;
+      color: #94A3B8;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    /* Steps box */
+    .steps-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      text-align: left;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13.5px;
+      color: #CBD5E1;
+      margin-bottom: 10px;
+    }
+
+    .step-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-number {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(255, 107, 107, 0.18);
+      color: #FF6B6B;
+      font-weight: 700;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* CTA Button */
+    .btn-open {
+      display: block;
+      width: 100%;
+      padding: 15px 24px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFFFFF;
+      text-decoration: none;
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+      border: none;
+      border-radius: 14px;
+      box-shadow: 0 10px 24px rgba(255, 107, 107, 0.35);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-open:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(255, 107, 107, 0.45);
+      filter: brightness(1.08);
+    }
+
+    .btn-open:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 18px rgba(255, 107, 107, 0.3);
+    }
+
+    /* Footer Note */
+    .note {
+      font-size: 12px;
+      color: #64748B;
+      margin-top: 22px;
+      line-height: 1.5;
+    }
+
+    .status-text {
+      font-size: 12.5px;
+      color: #38BDF8;
+      margin-top: 14px;
+      min-height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="card">
+    <div class="logo-badge">
+      <span>💸</span>
+      <span class="gradient-text">ExpenseIQ</span>
+    </div>
+
+    <div class="icon-container">
+      <svg class="checkmark" viewBox="0 0 52 52">
+        <path d="M14 27 L22 35 L38 17"/>
+      </svg>
+    </div>
+
+    <h1>Email Verified! 🎉</h1>
+    <p class="subtitle">Your email has been confirmed successfully. Your ExpenseIQ account is now active and ready to use.</p>
+
+    <div class="steps-box">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <span>Open the <strong>ExpenseIQ</strong> app on your phone</span>
+      </div>
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <span>Log in with your verified email & password</span>
+      </div>
+    </div>
+
+    <a href="expenseiq://login" class="btn-open" id="appBtn">Open ExpenseIQ App</a>
+
+    <div class="status-text" id="statusMsg"></div>
+
+    <p class="note">If the app does not open automatically, you can simply close this tab and return to the app on your phone.</p>
+  </div>
+
+  <script>
+    // Automatic deep-link trigger on mobile
+    window.addEventListener('DOMContentLoaded', function() {
+      var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      var status = document.getElementById('statusMsg');
+
+      if (isMobile) {
+        status.textContent = "Opening ExpenseIQ...";
+        setTimeout(function() {
+          window.location.href = "expenseiq://login";
+        }, 1100);
+      }
+    });
+  </script>
+</body>
+</html>

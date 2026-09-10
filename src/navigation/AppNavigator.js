@@ -270,6 +270,17 @@ const MainTabs = () => {
   );
 };
 
+// Deep linking configuration
+const linking = {
+  prefixes: ['expenseiq://'],
+  config: {
+    screens: {
+      Login: 'login',
+      Register: 'register',
+    },
+  },
+};
+
 // ── Root navigator ──────────────────────────────────────────────
 const AppNavigator = () => {
   const { user, loading } = useAuth();
@@ -308,8 +319,7 @@ const AppNavigator = () => {
   }
 
   return (
-
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!user ? (
           <>

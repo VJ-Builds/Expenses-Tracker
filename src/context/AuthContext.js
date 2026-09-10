@@ -161,7 +161,10 @@ export const AuthProvider = ({ children }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { username } }
+      options: {
+        data: { username },
+        emailRedirectTo: 'https://vijaypal-7.github.io/Expenses-Tracker/',
+      }
     });
     if (error) throw error;
     return data;
