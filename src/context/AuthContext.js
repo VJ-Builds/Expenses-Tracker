@@ -300,7 +300,7 @@ export const AuthProvider = ({ children }) => {
       password,
       options: {
         data: { username: cleanUsername },
-        emailRedirectTo: 'https://vijaypal-7.github.io/Expenses-Tracker/',
+        emailRedirectTo: 'https://vj-builds.github.io/Expenses-Tracker/',
       }
     });
     if (error) throw error;
@@ -377,7 +377,7 @@ export const AuthProvider = ({ children }) => {
       type: 'signup',
       email: emailToResend,
       options: {
-        emailRedirectTo: 'https://vijaypal-7.github.io/Expenses-Tracker/',
+        emailRedirectTo: 'https://vj-builds.github.io/Expenses-Tracker/',
       },
     });
     if (error) throw error;
