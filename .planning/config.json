@@ -1,0 +1,16 @@
+{
+  "project": "ExpenseIQ",
+  "version": "1.0.0",
+  "framework": "Expo SDK 57 / React Native 0.86",
+  "language": "JavaScript",
+  "workflow": {
+    "auto_verify": true,
+    "commit_per_phase": true,
+    "mode": "spec-driven"
+  },
+  "paths": {
+    "codebase_map": ".planning/codebase",
+    "plans": ".planning/phases",
+    "state": ".planning/STATE.md"
+  }
+}
