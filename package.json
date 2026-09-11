@@ -12,7 +12,7 @@
     "@react-navigation/stack": "^7.1.0",
     "@supabase/supabase-js": "^2.112.3",
     "bcryptjs": "^2.4.3",
-    "expo": "^57.0.20",
+    "expo": "~57.0.21",
     "expo-blur": "~57.0.2",
     "expo-build-properties": "~57.0.17",
     "expo-crypto": "~57.0.2",
