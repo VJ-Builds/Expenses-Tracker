@@ -171,5 +171,28 @@ export const initializeDatabase = () => {
       );
     }
   }
+
+  // ── notes table (single-table architecture for notes, checklists, & templates) ──
+  db.execSync(`
+    CREATE TABLE IF NOT EXISTS notes (
+      id              TEXT    PRIMARY KEY,
+      user_id         INTEGER NOT NULL DEFAULT 1,
+      title           TEXT,
+      content         TEXT,
+      type            TEXT    DEFAULT 'text',
+      folder          TEXT    DEFAULT 'General',
+      tags            TEXT    DEFAULT '[]',
+      color           TEXT    DEFAULT '#161622',
+      is_pinned       INTEGER DEFAULT 0,
+      is_archived     INTEGER DEFAULT 0,
+      is_trashed      INTEGER DEFAULT 0,
+      is_locked       INTEGER DEFAULT 0,
+      checklist_data  TEXT    DEFAULT '[]',
+      reminder_at     TEXT,
+      created_at      TEXT    DEFAULT (datetime('now')),
+      updated_at      TEXT    DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
 };
 

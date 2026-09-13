@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ActivityIndicator } from 'react-native';
-import { Home, List, PieChart, BarChart2, MoreHorizontal, AlignLeft, Bell, Plus, Search } from 'lucide-react-native';
+import { Home, List, PieChart, BarChart2, MoreHorizontal, AlignLeft, Bell, Plus, Search, LayoutGrid } from 'lucide-react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Platform } from 'react-native';
@@ -30,6 +30,9 @@ import MenuScreen            from '../screens/MenuScreen';
 import NotificationsScreen   from '../screens/NotificationsScreen';
 import CategoryManagementScreen from '../screens/CategoryManagementScreen';
 import PaymentMethodsScreen    from '../screens/PaymentMethodsScreen';
+import AppsHubScreen           from '../screens/AppsHubScreen';
+import NotesListScreen         from '../notes/screens/NotesListScreen';
+import NoteEditorScreen        from '../notes/screens/NoteEditorScreen';
 
 const Stack = createStackNavigator();
 const Tab   = createBottomTabNavigator();
@@ -90,8 +93,17 @@ const AppHeader = ({ title, route, navigation: navProp }) => {
   return (
     <SafeAreaView style={headerStyles.safe} edges={['top']}>
       <View style={headerStyles.container}>
-        {/* Left — hamburger */}
-        <AnimatedHamburger onPress={() => navigation.navigate('Menu')} />
+        {/* Left — hamburger and App Switcher */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <AnimatedHamburger onPress={() => navigation.navigate('Menu')} />
+          <TouchableOpacity
+            style={headerStyles.iconBtn}
+            onPress={() => navigation.navigate('AppsHub')}
+            activeOpacity={0.7}
+          >
+            <LayoutGrid stroke="#2563EB" size={20} strokeWidth={2.2} />
+          </TouchableOpacity>
+        </View>
 
         {/* Center — page title */}
         <Text style={headerStyles.title}>{title}</Text>
@@ -144,26 +156,30 @@ const TabIcon = ({ IconComponent, label, focused }) => {
 const CenterAddButton = ({ onPress }) => (
   <TouchableOpacity
     style={{
-      top: -20,
+      top: -18,
       justifyContent: 'center',
       alignItems: 'center',
-      ...SHADOWS.strong
+      shadowColor: '#FF6B6B',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.35,
+      shadowRadius: 10,
+      elevation: 8,
     }}
     onPress={onPress}
-    activeOpacity={0.8}
+    activeOpacity={0.85}
   >
     <LinearGradient
       colors={['#FF6B6B', '#FF8E53']}
       style={{
-        width: 56,
-        height: 56,
-        borderRadius: 28,
+        width: 52,
+        height: 52,
+        borderRadius: 26,
         justifyContent: 'center',
         alignItems: 'center',
       }}
       start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
     >
-      <Plus stroke="#FFF" size={32} />
+      <Plus stroke="#FFF" size={28} />
     </LinearGradient>
   </TouchableOpacity>
 );
@@ -177,9 +193,9 @@ const renderTabHeader = ({ route }) => (
 const MainTabs = () => {
   const insets = useSafeAreaInsets();
   
-  // On Android, insets.bottom might be 0 depending on edge-to-edge config, so we add a little extra padding
-  const bottomPadding = Platform.OS === 'android' ? Math.max(insets.bottom, 12) : insets.bottom;
-  const tabHeight = 64 + bottomPadding;
+  // Compact, snug bottom padding matching native Android bottom navigation
+  const bottomPadding = insets.bottom > 0 ? insets.bottom : (Platform.OS === 'android' ? 4 : 8);
+  const tabHeight = 56 + bottomPadding;
 
   return (
     <Tab.Navigator
@@ -193,7 +209,7 @@ const MainTabs = () => {
           borderTopWidth: 1,
           height: tabHeight,
           paddingBottom: bottomPadding,
-          paddingTop: 8,
+          paddingTop: 4,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -2 },
           shadowOpacity: 0.05,
@@ -202,7 +218,7 @@ const MainTabs = () => {
         },
         tabBarShowLabel: false,
         tabBarItemStyle: {
-          height: 64, // the actual clickable area minus padding
+          height: 52, // compact clickable area
           alignItems: 'center',
           justifyContent: 'center',
         },
@@ -275,9 +291,12 @@ const linking = {
   prefixes: ['expenseiq://'],
   config: {
     screens: {
+      AppsHub: '',
       Login: 'login',
       Register: 'register',
-      Main: 'verified',
+      Main: 'expenses',
+      NotesList: 'notes',
+      NoteEditor: 'note/:noteId',
     },
   },
 };
@@ -321,7 +340,10 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer linking={linking}>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        initialRouteName={user ? 'AppsHub' : 'Login'}
+        screenOptions={{ headerShown: false }}
+      >
         {!user ? (
           <>
             <Stack.Screen name="Login"    component={LoginScreen} />
@@ -329,7 +351,10 @@ const AppNavigator = () => {
           </>
         ) : (
           <>
+            <Stack.Screen name="AppsHub" component={AppsHubScreen} />
             <Stack.Screen name="Main" component={MainTabs} />
+            <Stack.Screen name="NotesList" component={NotesListScreen} />
+            <Stack.Screen name="NoteEditor" component={NoteEditorScreen} />
             <Stack.Screen
               name="AddExpense"
               component={AddExpenseScreen}

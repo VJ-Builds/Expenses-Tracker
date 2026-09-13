@@ -4,7 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import {
   PieChart, BarChart2, Tag, CreditCard, HardDrive, Cloud,
-  Download, Settings, HelpCircle, Info, LogOut, ChevronRight, Calendar, Bell
+  Download, Settings, HelpCircle, Info, LogOut, ChevronRight, Calendar, Bell,
+  LayoutGrid, FileText
 } from 'lucide-react-native';
 import { useAuth } from '../context/AuthContext';
 import { FONTS, SHADOWS, RADIUS } from '../constants/theme';
@@ -183,6 +184,16 @@ export default function MenuScreen() {
 
         {/* Menu Rows */}
         <View style={styles.section}>
+          <MenuRow
+            icon={LayoutGrid} iconColor="#2563EB" label="My Apps (App Switcher)"
+            onPress={() => navigation.navigate('AppsHub')}
+          />
+          <View style={styles.divider} />
+          <MenuRow
+            icon={FileText} iconColor="#3B82F6" label="Notes App"
+            onPress={() => navigation.navigate('NotesList')}
+          />
+          <View style={styles.divider} />
           <MenuRow
             icon={PieChart} iconColor={BRAND_PURPLE} label="Budget"
             onPress={() => navigation.navigate('Main', { screen: 'Budget' })}
