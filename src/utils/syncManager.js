@@ -41,7 +41,7 @@ const executeWithClockSkewRetry = async (queryFn, maxRetries = 2, delayMs = 2000
 export const getExpenseExportPayload = (user) => {
   if (!user || !user.id) return null;
   const db = getDb();
-  
+
   const expenses = db.getAllSync(
     `SELECT e.id, e.category_id, e.amount, e.currency, e.payment_method, e.description, e.date, c.name as category_name
      FROM expenses e
@@ -49,7 +49,7 @@ export const getExpenseExportPayload = (user) => {
      WHERE e.user_id = ?`,
     [user.id]
   );
-  
+
   const categories = db.getAllSync(
     `SELECT id, name, icon, color, user_id, sort_order FROM categories 
      WHERE user_id = ? OR user_id IS NULL
@@ -69,7 +69,7 @@ export const getExpenseExportPayload = (user) => {
        id ASC;`,
     [user.id]
   );
-  
+
   const monthlyBudgets = getMonthlyBudgetsJson(user.id);
 
   // Pure ExpenseIQ payload (stored in Supabase data_json column)
@@ -81,9 +81,9 @@ export const getExpenseExportPayload = (user) => {
       username: user.username,
       email: user.email,
     },
-    monthlyBudgets,
-    categories,
     paymentMethods,
+    categories,
+    monthlyBudgets,
     expenses,
   };
 };
@@ -119,13 +119,13 @@ export const getExportPayload = getExpenseExportPayload;
 
 export const syncUp = async (user) => {
   if (!user || !user.email) return { success: false, message: 'No user session' };
-  
+
   const state = await NetInfo.fetch();
   if (!state.isConnected) {
     await AsyncStorage.setItem(PENDING_SYNC_KEY, 'true');
     return { success: false, message: 'Offline' };
   }
-  
+
   try {
     let { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) {
@@ -138,11 +138,11 @@ export const syncUp = async (user) => {
             session = signInRes.data.session;
             await AsyncStorage.removeItem('@expenses_pending_auth');
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     if (!session?.user) return { success: false, message: 'Not authenticated with cloud' };
-    
+
     const expensePayload = getExpenseExportPayload(user);
     const notesPayload = await getNotesExportPayload(user);
     if (!expensePayload) return { success: false, message: 'Failed to generate payload' };
@@ -173,9 +173,9 @@ export const syncUp = async (user) => {
       });
       error = fallbackRes?.error;
     }
-    
+
     if (error) throw error;
-    
+
     await AsyncStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
     await AsyncStorage.setItem(PENDING_SYNC_KEY, 'false');
     return { success: true };
@@ -187,10 +187,10 @@ export const syncUp = async (user) => {
 
 export const syncDown = async (user) => {
   if (!user || !user.id || !user.email) return { success: false, message: 'No user session' };
-  
+
   const state = await NetInfo.fetch();
   if (!state.isConnected) return { success: false, message: 'Offline' };
-  
+
   try {
     let { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) {
@@ -203,11 +203,11 @@ export const syncDown = async (user) => {
             session = signInRes.data.session;
             await AsyncStorage.removeItem('@expenses_pending_auth');
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     if (!session?.user) return { success: false, message: 'Not authenticated with cloud' };
-    
+
     let syncRes = await executeWithClockSkewRetry(async () => {
       return await supabase
         .from('user_sync_data')
@@ -225,28 +225,28 @@ export const syncDown = async (user) => {
           .single();
       });
     }
-    
+
     const { data, error } = syncRes;
-      
+
     if (error && error.code !== 'PGRST116') throw error; // PGRST116 is not found
     if (!data || (!data.data_json && !data.notes_data)) return { success: true, message: 'No cloud data to sync' };
-    
+
     // Check if we already synced this
     const localLastSync = await AsyncStorage.getItem(LAST_SYNC_KEY);
     if (localLastSync && new Date(data.last_synced_at) <= new Date(localLastSync)) {
       return { success: true, message: 'Already up to date' };
     }
-    
+
     let backupData = data.data_json || {};
     if (typeof backupData === 'string') {
-      try { backupData = JSON.parse(backupData); } catch (e) {}
+      try { backupData = JSON.parse(backupData); } catch (e) { }
     }
     let notesData = data.notes_data;
     if (typeof notesData === 'string') {
-      try { notesData = JSON.parse(notesData); } catch (e) {}
+      try { notesData = JSON.parse(notesData); } catch (e) { }
     }
     const db = getDb();
-    
+
     db.withTransactionSync(() => {
       if (backupData && (backupData.expenses || backupData.categories)) {
         // Clean old data first since we are mirroring the exact state
@@ -254,7 +254,7 @@ export const syncDown = async (user) => {
         db.runSync('DELETE FROM category_budgets WHERE user_id = ?', [user.id]);
         db.runSync('DELETE FROM categories WHERE user_id = ?', [user.id]);
         db.runSync('DELETE FROM payment_methods WHERE user_id = ?', [user.id]);
-        
+
         // Restore month-wise budgets
         if (backupData.monthlyBudgets && typeof backupData.monthlyBudgets === 'object') {
           saveMonthlyBudgetsJson(user.id, backupData.monthlyBudgets);
@@ -264,7 +264,7 @@ export const syncDown = async (user) => {
             [currentMonth]: { overall: Number(backupData.user.monthly_budget) || 0, categories: {} },
           });
         }
-        
+
         if (Array.isArray(backupData.categories)) {
           for (const cat of backupData.categories) {
             db.runSync(
@@ -307,7 +307,7 @@ export const syncDown = async (user) => {
       // Restore notes: from dedicated notes_data column, or legacy data_json.notes
       let notesList = notesData?.notes || (Array.isArray(notesData) ? notesData : backupData?.notes);
       if (typeof notesList === 'string') {
-        try { notesList = JSON.parse(notesList); } catch (e) {}
+        try { notesList = JSON.parse(notesList); } catch (e) { }
       }
       if (Array.isArray(notesList)) {
         db.runSync('DELETE FROM notes WHERE user_id = ?', [user.id]);
@@ -345,7 +345,7 @@ export const syncDown = async (user) => {
         await saveCustomFolder(user.id, folder);
       }
     }
-    
+
     await AsyncStorage.setItem(LAST_SYNC_KEY, data.last_synced_at);
     const importedCount = (backupData?.expenses?.length || 0) + (notesData?.notes?.length || 0);
     return { success: true, imported: importedCount };
@@ -357,7 +357,7 @@ export const syncDown = async (user) => {
 
 export const autoSync = async (user) => {
   if (!user || !user.email) return { success: false, message: 'No user session' };
-  
+
   const state = await NetInfo.fetch();
   if (!state.isConnected) return { success: false, message: 'Offline' };
 
@@ -370,7 +370,7 @@ export const autoSync = async (user) => {
       }
       return upRes;
     }
-    
+
     // Check if cloud has newer data
     const downRes = await syncDown(user);
     if (downRes.success && (downRes.message === 'Already up to date' || downRes.message === 'No cloud data to sync')) {
