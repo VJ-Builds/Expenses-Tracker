@@ -21,6 +21,13 @@ export const parseNoteRow = (row) => {
     is_locked: Boolean(row.is_locked),
     tags: safeJsonParse(row.tags, []),
     checklist_data: safeJsonParse(row.checklist_data, []),
+    font_family: row.font_family || 'Poppins',
+    font_size: Number(row.font_size) || 16,
+    text_align: row.text_align || 'left',
+    ink_color: row.ink_color || '#0F172A',
+    checklist_style: row.checklist_style || 'checkbox',
+    checklist_font_size: Number(row.checklist_font_size) || 16,
+    checklist_ink_color: row.checklist_ink_color || '#0F172A',
   };
 };
 
@@ -82,7 +89,7 @@ export const getNotes = (userId, options = {}) => {
 };
 
 /**
- * Fetch a single note by ID
+ * Get a single note by ID
  */
 export const getNoteById = (id) => {
   const db = getDb();
@@ -107,6 +114,13 @@ export const createNote = ({
   folder = 'General',
   tags = [],
   color = '#161622',
+  fontFamily = 'Poppins',
+  fontSize = 16,
+  textAlign = 'left',
+  inkColor = '#0F172A',
+  checklistStyle = 'checkbox',
+  checklistFontSize = 16,
+  checklistInkColor = '#0F172A',
   isPinned = false,
   isLocked = false,
   checklistData = [],
@@ -121,8 +135,10 @@ export const createNote = ({
   db.runSync(
     `INSERT INTO notes (
       id, user_id, title, content, type, folder, tags, color, 
+      font_family, font_size, text_align, ink_color, checklist_style,
+      checklist_font_size, checklist_ink_color,
       is_pinned, is_archived, is_trashed, is_locked, checklist_data, reminder_at, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?);`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?);`,
     [
       id,
       userId,
@@ -132,6 +148,13 @@ export const createNote = ({
       folder || 'General',
       tagsJson,
       color || '#161622',
+      fontFamily || 'Poppins',
+      Number(fontSize) || 16,
+      textAlign || 'left',
+      inkColor || '#0F172A',
+      checklistStyle || 'checkbox',
+      Number(checklistFontSize) || 16,
+      checklistInkColor || '#0F172A',
       isPinned ? 1 : 0,
       isLocked ? 1 : 0,
       checklistJson,
@@ -158,6 +181,13 @@ export const updateNote = (id, updates = {}) => {
   const type = updates.type !== undefined ? updates.type : existing.type;
   const folder = updates.folder !== undefined ? updates.folder : existing.folder;
   const color = updates.color !== undefined ? updates.color : existing.color;
+  const fontFamily = updates.fontFamily !== undefined ? updates.fontFamily : (existing.font_family || 'Poppins');
+  const fontSize = updates.fontSize !== undefined ? Number(updates.fontSize) : (Number(existing.font_size) || 16);
+  const textAlign = updates.textAlign !== undefined ? updates.textAlign : (existing.text_align || 'left');
+  const inkColor = updates.inkColor !== undefined ? updates.inkColor : (existing.ink_color || '#0F172A');
+  const checklistStyle = updates.checklistStyle !== undefined ? updates.checklistStyle : (existing.checklist_style || 'checkbox');
+  const checklistFontSize = updates.checklistFontSize !== undefined ? Number(updates.checklistFontSize) : (Number(existing.checklist_font_size) || 16);
+  const checklistInkColor = updates.checklistInkColor !== undefined ? updates.checklistInkColor : (existing.checklist_ink_color || '#0F172A');
   const reminderAt = updates.reminderAt !== undefined ? updates.reminderAt : existing.reminder_at;
   const isPinned = updates.isPinned !== undefined ? (updates.isPinned ? 1 : 0) : (existing.is_pinned ? 1 : 0);
   const isLocked = updates.isLocked !== undefined ? (updates.isLocked ? 1 : 0) : (existing.is_locked ? 1 : 0);
@@ -168,6 +198,8 @@ export const updateNote = (id, updates = {}) => {
   db.runSync(
     `UPDATE notes SET 
       title = ?, content = ?, type = ?, folder = ?, tags = ?, color = ?, 
+      font_family = ?, font_size = ?, text_align = ?, ink_color = ?, checklist_style = ?,
+      checklist_font_size = ?, checklist_ink_color = ?,
       is_pinned = ?, is_locked = ?, checklist_data = ?, reminder_at = ?, updated_at = ?
      WHERE id = ?;`,
     [
@@ -177,6 +209,13 @@ export const updateNote = (id, updates = {}) => {
       folder,
       tagsJson,
       color,
+      fontFamily,
+      fontSize,
+      textAlign,
+      inkColor,
+      checklistStyle,
+      checklistFontSize,
+      checklistInkColor,
       isPinned,
       isLocked,
       checklistJson,

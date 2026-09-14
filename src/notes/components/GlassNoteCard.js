@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Pin, CheckSquare, FileText, Lock } from 'lucide-react-native';
 import { FONTS } from '../../constants/theme';
+import { getNoteFontFamily } from '../constants/typography';
+import { stripRichTags } from '../utils/richTextParser';
 
 export default function GlassNoteCard({ note, onPress, onLongPress, isGridView = false }) {
   if (!note) return null;
@@ -39,7 +41,13 @@ export default function GlassNoteCard({ note, onPress, onLongPress, isGridView =
       >
         {/* Grid Header: Title & Pin */}
         <View style={styles.gridHeaderRow}>
-          <Text style={styles.gridTitle} numberOfLines={1}>
+          <Text
+            style={[
+              styles.gridTitle,
+              { fontFamily: getNoteFontFamily(note.font_family, true) },
+            ]}
+            numberOfLines={1}
+          >
             {note.title || 'Untitled Note'}
           </Text>
           <View style={styles.headerRightWrap}>
@@ -85,8 +93,14 @@ export default function GlassNoteCard({ note, onPress, onLongPress, isGridView =
               )}
             </View>
           ) : (
-            <Text style={styles.contentSnippet} numberOfLines={3}>
-              {note.content ? note.content.trim() : 'No text content'}
+            <Text
+              style={[
+                styles.contentSnippet,
+                { fontFamily: getNoteFontFamily(note.font_family, false) },
+              ]}
+              numberOfLines={3}
+            >
+              {note.content ? stripRichTags(note.content.trim()) : 'No text content'}
             </Text>
           )}
         </View>
@@ -122,7 +136,13 @@ export default function GlassNoteCard({ note, onPress, onLongPress, isGridView =
     >
       {/* Top row: Title on left, Folder & Pin on right */}
       <View style={styles.listHeaderRow}>
-        <Text style={styles.listTitle} numberOfLines={1}>
+        <Text
+          style={[
+            styles.listTitle,
+            { fontFamily: getNoteFontFamily(note.font_family, true) },
+          ]}
+          numberOfLines={1}
+        >
           {note.title || 'Untitled Note'}
         </Text>
         <View style={styles.headerRightWrap}>
@@ -150,8 +170,14 @@ export default function GlassNoteCard({ note, onPress, onLongPress, isGridView =
             </Text>
           </View>
         ) : (
-          <Text style={styles.listContentSnippet} numberOfLines={2}>
-            {note.content ? note.content.trim() : 'No text content'}
+          <Text
+            style={[
+              styles.listContentSnippet,
+              { fontFamily: getNoteFontFamily(note.font_family, false) },
+            ]}
+            numberOfLines={2}
+          >
+            {note.content ? stripRichTags(note.content.trim()) : 'No text content'}
           </Text>
         )}
       </View>

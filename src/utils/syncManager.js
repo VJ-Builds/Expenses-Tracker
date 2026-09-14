@@ -314,8 +314,8 @@ export const syncDown = async (user) => {
         for (const n of notesList) {
           db.runSync(
             `INSERT OR REPLACE INTO notes 
-              (id, user_id, title, content, type, folder, tags, color, is_pinned, is_archived, is_trashed, is_locked, checklist_data, reminder_at, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              (id, user_id, title, content, type, folder, tags, color, font_family, font_size, is_pinned, is_archived, is_trashed, is_locked, checklist_data, reminder_at, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
               n.id,
               user.id,
@@ -325,6 +325,8 @@ export const syncDown = async (user) => {
               n.folder || 'General',
               typeof n.tags === 'string' ? n.tags : JSON.stringify(n.tags || []),
               n.color || '#FFFFFF',
+              n.font_family || 'Poppins',
+              Number(n.font_size) || 16,
               n.is_pinned ? 1 : 0,
               n.is_archived ? 1 : 0,
               n.is_trashed ? 1 : 0,

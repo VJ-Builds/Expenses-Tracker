@@ -188,11 +188,58 @@ export const initializeDatabase = () => {
       is_trashed      INTEGER DEFAULT 0,
       is_locked       INTEGER DEFAULT 0,
       checklist_data  TEXT    DEFAULT '[]',
+      font_family     TEXT    DEFAULT 'Poppins',
+      font_size       INTEGER DEFAULT 16,
+      text_align      TEXT    DEFAULT 'left',
+      ink_color       TEXT    DEFAULT '#0F172A',
+      checklist_style TEXT    DEFAULT 'checkbox',
       reminder_at     TEXT,
       created_at      TEXT    DEFAULT (datetime('now')),
       updated_at      TEXT    DEFAULT (datetime('now')),
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
   `);
+
+  try {
+    db.execSync("ALTER TABLE notes ADD COLUMN font_family TEXT DEFAULT 'Poppins';");
+  } catch (e) {
+    // Column might already exist
+  }
+
+  try {
+    db.execSync("ALTER TABLE notes ADD COLUMN font_size INTEGER DEFAULT 16;");
+  } catch (e) {
+    // Column might already exist
+  }
+
+  try {
+    db.execSync("ALTER TABLE notes ADD COLUMN text_align TEXT DEFAULT 'left';");
+  } catch (e) {
+    // Column might already exist
+  }
+
+  try {
+    db.execSync("ALTER TABLE notes ADD COLUMN ink_color TEXT DEFAULT '#0F172A';");
+  } catch (e) {
+    // Column might already exist
+  }
+
+  try {
+    db.execSync("ALTER TABLE notes ADD COLUMN checklist_style TEXT DEFAULT 'checkbox';");
+  } catch (e) {
+    // Column might already exist
+  }
+
+  try {
+    db.execSync("ALTER TABLE notes ADD COLUMN checklist_font_size INTEGER DEFAULT 16;");
+  } catch (e) {
+    // Column might already exist
+  }
+
+  try {
+    db.execSync("ALTER TABLE notes ADD COLUMN checklist_ink_color TEXT DEFAULT '#0F172A';");
+  } catch (e) {
+    // Column might already exist
+  }
 };
 
