@@ -20,6 +20,7 @@ import {
   Bell,
   Settings,
   User as UserIcon,
+  Gamepad2,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -151,29 +152,24 @@ export default function AppsHubScreen() {
 
           {/* Row 2: Secondary / Expansion Apps */}
           <View style={styles.gridRow}>
-            {/* Card 3: More Apps */}
+            {/* Card 3: Games */}
             <TouchableOpacity
-              style={[styles.appCard, styles.cardMore]}
-              onPress={() =>
-                Alert.alert(
-                  'Coming Soon! 🚀',
-                  'We are building more productivity tools for the VJ Builds suite. Stay tuned!'
-                )
-              }
+              style={[styles.appCard, styles.cardGames]}
+              onPress={() => navigation.navigate('GamesHub')}
               activeOpacity={0.85}
             >
               <View style={styles.cardHeader}>
                 <View style={[styles.appIconWrap, { backgroundColor: '#8B5CF6' }]}>
-                  <LayoutGrid stroke="#FFFFFF" size={24} strokeWidth={2.2} />
+                  <Gamepad2 stroke="#FFFFFF" size={24} strokeWidth={2.2} />
                 </View>
                 <View style={[styles.badgePill, { backgroundColor: '#F3E8FF' }]}>
-                  <Text style={[styles.badgeText, { color: '#8B5CF6' }]}>Coming Soon</Text>
+                  <Text style={[styles.badgeText, { color: '#8B5CF6' }]}>Entertainment</Text>
                 </View>
               </View>
 
-              <Text style={styles.cardTitle}>More Apps</Text>
+              <Text style={styles.cardTitle}>Games</Text>
               <Text style={styles.cardDesc}>
-                We’re working on more useful apps to make your day better.
+                Play fun casual and brain mini-games to unwind and test your skills.
               </Text>
 
               <View style={styles.cardFooter}>

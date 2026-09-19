@@ -33,6 +33,7 @@ import PaymentMethodsScreen    from '../screens/PaymentMethodsScreen';
 import AppsHubScreen           from '../screens/AppsHubScreen';
 import NotesListScreen         from '../notes/screens/NotesListScreen';
 import NoteEditorScreen        from '../notes/screens/NoteEditorScreen';
+import GamesHubScreen          from '../games/screens/GamesHubScreen';
 
 const Stack = createStackNavigator();
 const Tab   = createBottomTabNavigator();
@@ -352,6 +353,7 @@ const AppNavigator = () => {
         ) : (
           <>
             <Stack.Screen name="AppsHub" component={AppsHubScreen} />
+            <Stack.Screen name="GamesHub" component={GamesHubScreen} />
             <Stack.Screen name="Main" component={MainTabs} />
             <Stack.Screen name="NotesList" component={NotesListScreen} />
             <Stack.Screen name="NoteEditor" component={NoteEditorScreen} />
