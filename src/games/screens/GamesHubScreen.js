@@ -19,6 +19,7 @@ import {
   Type,
   Flag,
   Play,
+  Swords,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -49,12 +50,18 @@ export default function GamesHubScreen() {
         return <Type {...props} />;
       case 'Flag':
         return <Flag {...props} />;
+      case 'Swords':
+        return <Swords {...props} />;
       default:
         return <Gamepad2 {...props} />;
     }
   };
 
   const handleGamePress = (game) => {
+    if (game.status === 'playable' && game.route) {
+      navigation.navigate(game.route);
+      return;
+    }
     Alert.alert(
       `🎮 ${game.title}`,
       `"${game.title}" is queued up in our Games Hub!\n\n${game.description}\n\nLet's build this game first together!`,

@@ -34,6 +34,11 @@ import AppsHubScreen           from '../screens/AppsHubScreen';
 import NotesListScreen         from '../notes/screens/NotesListScreen';
 import NoteEditorScreen        from '../notes/screens/NoteEditorScreen';
 import GamesHubScreen          from '../games/screens/GamesHubScreen';
+import WrongWayMenuScreen      from '../games/wrongway/screens/WrongWayMenuScreen';
+import WrongWayConfigScreen    from '../games/wrongway/screens/WrongWayConfigScreen';
+import WrongWayGameScreen      from '../games/wrongway/screens/WrongWayGameScreen';
+import WrongWay2v2Screen       from '../games/wrongway/screens/WrongWay2v2Screen';
+import WrongWayStatsScreen     from '../games/wrongway/screens/WrongWayStatsScreen';
 
 const Stack = createStackNavigator();
 const Tab   = createBottomTabNavigator();
@@ -298,6 +303,12 @@ const linking = {
       Main: 'expenses',
       NotesList: 'notes',
       NoteEditor: 'note/:noteId',
+      GamesHub: 'games',
+      WrongWayMenu: 'games/wrongway',
+      WrongWayConfig: 'games/wrongway/config',
+      WrongWayGame: 'games/wrongway/play',
+      WrongWay2v2: 'games/wrongway/2v2',
+      WrongWayStats: 'games/wrongway/stats',
     },
   },
 };
@@ -354,6 +365,11 @@ const AppNavigator = () => {
           <>
             <Stack.Screen name="AppsHub" component={AppsHubScreen} />
             <Stack.Screen name="GamesHub" component={GamesHubScreen} />
+            <Stack.Screen name="WrongWayMenu" component={WrongWayMenuScreen} />
+            <Stack.Screen name="WrongWayConfig" component={WrongWayConfigScreen} />
+            <Stack.Screen name="WrongWayGame" component={WrongWayGameScreen} />
+            <Stack.Screen name="WrongWay2v2" component={WrongWay2v2Screen} />
+            <Stack.Screen name="WrongWayStats" component={WrongWayStatsScreen} />
             <Stack.Screen name="Main" component={MainTabs} />
             <Stack.Screen name="NotesList" component={NotesListScreen} />
             <Stack.Screen name="NoteEditor" component={NoteEditorScreen} />

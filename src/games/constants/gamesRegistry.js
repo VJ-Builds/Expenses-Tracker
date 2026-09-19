@@ -5,6 +5,20 @@
 
 export const GAMES_LIST = [
   {
+    id: 'wrongway',
+    title: 'Wrong Way',
+    subtitle: "Don't be mad",
+    description: 'Block paths with barricades, jump opponents, and sprint to the goal line!',
+    icon: 'Swords',
+    iconName: 'Swords',
+    color: '#8B5CF6',
+    bgColor: '#F5F3FF',
+    category: 'Strategy',
+    badge: 'NEW 🔥',
+    status: 'playable',
+    route: 'WrongWayMenu',
+  },
+  {
     id: 'tictactoe',
     title: 'Tic Tac Toe',
     subtitle: 'Classic X & O',
