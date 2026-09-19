@@ -39,7 +39,7 @@
             "enablePngCrunchInReleaseBuilds": true,
             "useLegacyPackaging": true,
             "buildArchs": ["arm64-v8a"],
-            "extraProguardRules": "-dontwarn expo.modules.**\n-keep class expo.modules.** { *; }\n-dontwarn com.facebook.react.**\n-keep class com.facebook.react.** { *; }\n-dontwarn com.swmansion.reanimated.**\n-keep class com.swmansion.reanimated.** { *; }\n-dontwarn com.swmansion.worklets.**\n-keep class com.swmansion.worklets.** { *; }\n-dontwarn com.reactnativecommunity.asyncstorage.**\n-keep class com.reactnativecommunity.asyncstorage.** { *; }\n-dontwarn com.reactnativecommunity.netinfo.**\n-keep class com.reactnativecommunity.netinfo.** { *; }\n-dontwarn com.horcrux.svg.**\n-keep class com.horcrux.svg.** { *; }"
+            "extraProguardRules": "-dontwarn expo.modules.**\n-keep class expo.modules.** { *; }\n-dontwarn com.facebook.react.**\n-keep class com.facebook.react.** { *; }\n-dontwarn com.swmansion.reanimated.**\n-keep class com.swmansion.reanimated.** { *; }\n-dontwarn com.swmansion.worklets.**\n-keep class com.swmansion.worklets.** { *; }\n-dontwarn com.reactnativecommunity.asyncstorage.**\n-keep class com.reactnativecommunity.asyncstorage.** { *; }\n-dontwarn com.reactnativecommunity.netinfo.**\n-keep class com.reactnativecommunity.netinfo.** { *; }\n-dontwarn com.horcrux.svg.**\n-keep class com.horcrux.svg.** { *; }\n-dontwarn com.reactnativecommunity.webview.**\n-keep class com.reactnativecommunity.webview.** { *; }\n-keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }\n-dontwarn fr.greweb.reactnativeviewshot.**\n-keep class fr.greweb.reactnativeviewshot.** { *; }"
           }
         }
       ],
