@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   StatusBar,
   Platform,
   Alert,
@@ -34,6 +33,7 @@ import {
   Star,
 } from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { FONTS } from '../../constants/theme';
 import {
@@ -73,6 +73,7 @@ const COLOR_PALETTES = [
 export default function NoteEditorScreen() {
   const navigation = useNavigation();
   const route = useRoute();
+  const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const noteIdParam = route.params?.noteId || null;
   const initialType = route.params?.initialType || 'text';
@@ -574,7 +575,7 @@ export default function NoteEditorScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: color === '#FFFFFF' ? '#F3F6FB' : color + '15' }]}>
+    <View style={[styles.safeArea, { paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0), backgroundColor: color === '#FFFFFF' ? '#F3F6FB' : color + '15' }]}>
       <StatusBar barStyle="dark-content" />
 
       {/* Floating Glass Top Bar */}
@@ -1454,7 +1455,7 @@ export default function NoteEditorScreen() {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -1577,6 +1578,7 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   checklistSection: {
+    minHeight: 280,
     marginBottom: 20,
   },
   addCheckItemRow: {
