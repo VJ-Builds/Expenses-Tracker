@@ -11,6 +11,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONTS } from '../../../constants/theme';
@@ -114,7 +116,7 @@ export default function ReplayViewerModal({
           styles.container,
           {
             backgroundColor: theme.bg,
-            paddingTop: Math.max(insets.top, 16),
+            paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 16),
             paddingBottom: Math.max(insets.bottom, 20),
           },
         ]}

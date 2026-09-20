@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Platform,
+  StatusBar,
   Alert,
 } from 'react-native';
 import {
@@ -70,7 +71,8 @@ export default function GamesHubScreen() {
   };
 
   return (
-    <View style={[styles.safeArea, { paddingTop: insets.top }]}>
+    <View style={[styles.safeArea, { paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0) }]}>
+      <StatusBar barStyle="dark-content" />
       {/* Ambient background glowing orbs */}
       <View style={styles.backgroundContainer} pointerEvents="none">
         <View style={[styles.orb, styles.orb1]} />

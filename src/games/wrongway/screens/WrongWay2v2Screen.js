@@ -14,6 +14,8 @@ import {
   TouchableOpacity,
   Alert,
   Modal,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import {
   ArrowLeft,
@@ -201,11 +203,12 @@ export default function WrongWay2v2Screen() {
         styles.container,
         {
           backgroundColor: theme.bg,
-          paddingTop: Math.max(insets.top, 8),
+          paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 8),
           paddingBottom: Math.max(insets.bottom, 16),
         },
       ]}
     >
+      <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} />
       {/* Header */}
       <View style={styles.topRow}>
         <TouchableOpacity

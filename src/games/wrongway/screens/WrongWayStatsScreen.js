@@ -11,6 +11,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import {
   ArrowLeft,
@@ -85,7 +87,8 @@ export default function WrongWayStatsScreen() {
   const winRate = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: insets.top }]}>
+    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0) }]}>
+      <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} />
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 32 }]}
         showsVerticalScrollIndicator={false}

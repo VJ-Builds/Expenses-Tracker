@@ -10,6 +10,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import {
   ArrowLeft,
@@ -98,7 +100,8 @@ export default function WrongWayMenuScreen() {
   const currentTier = getRankTier(duelRating);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: insets.top }]}>
+    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0) }]}>
+      <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} />
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
         showsVerticalScrollIndicator={false}
