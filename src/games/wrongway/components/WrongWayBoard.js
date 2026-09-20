@@ -15,6 +15,7 @@ import {
 import { FONTS } from '../../../constants/theme';
 import { PLAYER_COLORS, THEME, MAP_TYPES } from '../constants/wrongWayConstants';
 import { isSteelWall } from '../engine/boardLogic';
+import ShatteringWall from './ShatteringWall';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -35,8 +36,9 @@ export default function WrongWayBoard({
   onGridIntersectionPress,
   chaosItem = null, // { r, c }
   hammers = [],     // [{ r, c, id }]
-  onHammerPress,
   hammerModeActive = false,
+  breakingWall = null, // { key, color }
+  onShatterComplete,
   darkMode = true,
 }) {
   const theme = darkMode ? THEME.dark : THEME.light;
@@ -250,7 +252,7 @@ export default function WrongWayBoard({
                   ]}
                   onPress={() => onCellPress && onCellPress(r, c)}
                   activeOpacity={0.7}
-                  disabled={!isValid && !isOccupied}
+                  disabled={!isValid && !isOccupied && !hammer && !isChaos}
                 >
                   {/* Valid move glowing center dot */}
                   {isValid && !isOccupied && (
@@ -264,7 +266,7 @@ export default function WrongWayBoard({
 
                   {/* Chaos Crate (+2 Barricades) */}
                   {isChaos && (
-                    <View style={styles.itemCrate}>
+                    <View style={styles.itemCrate} pointerEvents="none">
                       <Text style={styles.crateEmoji}>📦</Text>
                       <View style={styles.crateBadge}>
                         <Text style={styles.crateBadgeText}>+2</Text>
@@ -274,13 +276,9 @@ export default function WrongWayBoard({
 
                   {/* Hammer Item */}
                   {hammer && (
-                    <TouchableOpacity
-                      style={styles.itemHammer}
-                      onPress={() => onHammerPress && onHammerPress(hammer)}
-                      activeOpacity={0.8}
-                    >
+                    <View style={styles.itemHammer} pointerEvents="none">
                       <Text style={styles.hammerEmoji}>🔨</Text>
-                    </TouchableOpacity>
+                    </View>
                   )}
 
                   {/* Player Pawn Stone */}
@@ -329,25 +327,50 @@ export default function WrongWayBoard({
         ))}
 
         {/* Placed Walls */}
-        {renderedWalls.map(w => (
-          <TouchableOpacity
-            key={w.key}
-            style={w.style}
-            disabled={!hammerModeActive}
-            onPress={() => hammerModeActive && onCellPress && onCellPress('break_wall', w.key)}
-            activeOpacity={0.8}
-          >
-            {w.isSteel && (
-              <View style={styles.steelRivets}>
-                <View style={styles.rivet} />
-                <View style={styles.rivet} />
-              </View>
-            )}
-          </TouchableOpacity>
-        ))}
+        {renderedWalls.map(w => {
+          const isTargetable = hammerModeActive && !w.isSteel;
+          return (
+            <TouchableOpacity
+              key={w.key}
+              style={[
+                w.style,
+                isTargetable && {
+                  borderColor: '#F59E0B',
+                  borderWidth: 1.8,
+                  shadowColor: '#F59E0B',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.9,
+                  shadowRadius: 6,
+                  elevation: 9,
+                },
+              ]}
+              disabled={!hammerModeActive}
+              onPress={() => hammerModeActive && onCellPress && onCellPress('break_wall', w.key)}
+              activeOpacity={0.7}
+            >
+              {w.isSteel && (
+                <View style={styles.steelRivets}>
+                  <View style={styles.rivet} />
+                  <View style={styles.rivet} />
+                </View>
+              )}
+            </TouchableOpacity>
+          );
+        })}
 
         {/* Ghost Preview Wall */}
         {ghostWall && <View style={ghostWall.style} pointerEvents="none" />}
+
+        {/* Animated Shattering Wall Collapse in Pieces */}
+        {breakingWall && (
+          <ShatteringWall
+            wallKey={breakingWall.key}
+            cellSize={cellSize}
+            wallThickness={wallThickness}
+            color={breakingWall.color || '#94A3B8'}
+            onComplete={onShatterComplete}
+          />
+        )}
 
         {/* Invisible Touch Hit-boxes for Wall Intersections during placement mode */}
         {wallPlacementMode &&
@@ -478,7 +501,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   hammerEmoji: {
-    fontSize: 18,
+    fontSize: 20,
+    textShadowColor: '#F59E0B',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
   },
   steelRivets: {
     flexDirection: 'row',

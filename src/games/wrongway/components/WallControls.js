@@ -20,6 +20,7 @@ export default function WallControls({
   onSelectWallMode,       // (mode) => void
   wallsRemaining = 10,
   hasHammer = false,
+  hammerCount = 1,
   hammerActive = false,
   onToggleHammer,
   canSkip = false,
@@ -137,7 +138,11 @@ export default function WallControls({
               activeOpacity={0.8}
             >
               <Text style={styles.specialBtnText}>
-                {hammerActive ? '🔨 Tap Wall to Smash' : '🔨 Hammer Ready'}
+                {hammerActive
+                  ? '🔨 Tap Wall to Smash'
+                  : hammerCount > 1
+                  ? `🔨 Hammer Ready (${hammerCount})`
+                  : '🔨 Hammer Ready'}
               </Text>
             </TouchableOpacity>
           )}
