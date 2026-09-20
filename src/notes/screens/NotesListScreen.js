@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   FlatList,
   TextInput,
-  SafeAreaView,
   StatusBar,
   Platform,
   Alert,
@@ -30,6 +29,7 @@ import {
   Lock,
 } from 'lucide-react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { FONTS } from '../../constants/theme';
 import {
@@ -52,6 +52,7 @@ import { syncUp, syncDown } from '../../utils/syncManager';
 export default function NotesListScreen() {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState(['All', 'General', 'Work', 'Personal', 'Ideas', 'Finance']);
@@ -252,7 +253,7 @@ export default function NotesListScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={[styles.safeArea, { paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0) }]}>
       <StatusBar barStyle="dark-content" />
 
       {/* Ambient background glowing orbs */}
@@ -724,7 +725,7 @@ export default function NotesListScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
