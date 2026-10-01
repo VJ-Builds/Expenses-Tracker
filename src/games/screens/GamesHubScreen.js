@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Platform,
   StatusBar,
   Alert,
 } from 'react-native';
@@ -23,13 +22,14 @@ import {
   Swords,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONTS } from '../../constants/theme';
+import { useSafeInsets, useBottomSpace } from '../../constants/layout';
 import { GAMES_LIST } from '../constants/gamesRegistry';
 
 export default function GamesHubScreen() {
   const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
+  const insets = useSafeInsets();
+  const scrollPad = useBottomSpace({ extra: 24 });
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   const categories = ['All', 'Strategy', 'Puzzle', 'Memory', 'Arcade', 'Word'];
@@ -71,7 +71,7 @@ export default function GamesHubScreen() {
   };
 
   return (
-    <View style={[styles.safeArea, { paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0) }]}>
+    <View style={[styles.safeArea, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" />
       {/* Ambient background glowing orbs */}
       <View style={styles.backgroundContainer} pointerEvents="none">
@@ -101,7 +101,7 @@ export default function GamesHubScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: scrollPad }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Welcome / Promo Banner */}

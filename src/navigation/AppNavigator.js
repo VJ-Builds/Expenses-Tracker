@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { FONTS } from '../constants/theme';
+import { getTabBarHeight, getTabBarBottomPadding } from '../constants/layout';
 import NetInfo from '@react-native-community/netinfo';
 import { syncUp, syncDown, autoSync } from '../utils/syncManager';
 
@@ -198,10 +199,10 @@ const renderTabHeader = ({ route }) => (
 // ── Bottom tab navigator ────────────────────────────────────────
 const MainTabs = () => {
   const insets = useSafeAreaInsets();
-  
-  // Compact, snug bottom padding matching native Android bottom navigation
-  const bottomPadding = insets.bottom > 0 ? insets.bottom : (Platform.OS === 'android' ? 4 : 8);
-  const tabHeight = 56 + bottomPadding;
+
+  // Centralized so every screen (via useBottomSpace) agrees on the tab bar size.
+  const bottomPadding = getTabBarBottomPadding(insets);
+  const tabHeight = getTabBarHeight(insets);
 
   return (
     <Tab.Navigator

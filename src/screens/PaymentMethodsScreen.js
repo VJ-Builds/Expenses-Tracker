@@ -32,6 +32,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { useAuth } from '../context/AuthContext';
 import { FONTS, RADIUS, SHADOWS } from '../constants/theme';
+import { useBottomSpace } from '../constants/layout';
 import {
   getPaymentMethodsWithStats,
   addPaymentMethod,
@@ -175,6 +176,7 @@ function ReorderableMethodCard({
 export default function PaymentMethodsScreen() {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const listPad = useBottomSpace({ extra: 24 });
 
   const [methods, setMethods] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -500,7 +502,7 @@ export default function PaymentMethodsScreen() {
         </View>
       ) : (
         <ScrollView
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: listPad }]}
           keyboardShouldPersistTaps="handled"
           scrollEnabled={draggingIndex === null}
         >

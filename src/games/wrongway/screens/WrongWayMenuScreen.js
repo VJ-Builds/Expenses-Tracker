@@ -29,8 +29,8 @@ import {
   ChevronRight,
 } from 'lucide-react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONTS } from '../../../constants/theme';
+import { useSafeInsets } from '../../../constants/layout';
 import { THEME, getRankTier, MAP_TYPES } from '../constants/wrongWayConstants';
 import { getStats, getEloRatings, getXp, getSettings, updateSettings } from '../engine/storageService';
 import audio from '../engine/audioService';
@@ -38,7 +38,7 @@ import TutorialModal from '../components/TutorialModal';
 
 export default function WrongWayMenuScreen() {
   const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
+  const insets = useSafeInsets();
 
   const [darkMode, setDarkMode] = useState(true);
   const [soundOn, setSoundOn] = useState(true);
@@ -100,7 +100,7 @@ export default function WrongWayMenuScreen() {
   const currentTier = getRankTier(duelRating);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0) }]}>
+    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: insets.top }]}>
       <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} />
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}

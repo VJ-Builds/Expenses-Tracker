@@ -10,6 +10,7 @@ import { Search, X, Tag, ChevronDown, Check, Wallet, Calendar, RotateCcw } from 
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { FONTS, RADIUS, SHADOWS } from '../constants/theme';
+import { useBottomSpace } from '../constants/layout';
 import { useAuth } from '../context/AuthContext';
 import { getExpenses, deleteExpense, getCategoriesForUser, getPaymentMethodsForUser } from '../db/queries';
 import { syncUp } from '../utils/syncManager';
@@ -151,6 +152,8 @@ function Dropdown({ label, value, items, onChange, leftIcon, style }) {
 // ── Main Screen ───────────────────────────────────────────────────
 export default function TransactionsListScreen({ navigation, route }) {
   const { user } = useAuth();
+  // Clear the bottom tab bar on every device (gesture or button nav).
+  const listPad = useBottomSpace({ tabBar: true, extra: 24 });
 
   // Search controlled by header icon via route.params
   const searchOpen = route?.params?.searchOpen || false;
@@ -481,7 +484,7 @@ export default function TransactionsListScreen({ navigation, route }) {
             <Text style={styles.sectionTotal}>{formatAmount(section.total)}</Text>
           </View>
         )}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: listPad }]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={BRAND} />}
         ListEmptyComponent={
           <View style={styles.empty}>
@@ -597,7 +600,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontFamily: FONTS.bold, fontSize: 13, color: TEXT_DARK },
   sectionTotal: { fontFamily: FONTS.semiBold, fontSize: 12, color: TEXT_MUTED },
 
-  listContent: { paddingBottom: 100 },
+  listContent: {},
 
   empty: { alignItems: 'center', paddingTop: 80, paddingHorizontal: 40 },
   emptyIconWrap: {

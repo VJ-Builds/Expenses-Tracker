@@ -33,7 +33,7 @@ import {
   Star,
 } from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeInsets, useBottomSpace } from '../../constants/layout';
 import { useAuth } from '../../context/AuthContext';
 import { FONTS } from '../../constants/theme';
 import {
@@ -73,7 +73,9 @@ const COLOR_PALETTES = [
 export default function NoteEditorScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const insets = useSafeAreaInsets();
+  const insets = useSafeInsets();
+  // Clear the system navigation bar at the end of the scroll on every device.
+  const scrollPad = useBottomSpace({ extra: 40 });
   const { user } = useAuth();
   const noteIdParam = route.params?.noteId || null;
   const initialType = route.params?.initialType || 'text';
@@ -575,7 +577,7 @@ export default function NoteEditorScreen() {
   };
 
   return (
-    <View style={[styles.safeArea, { paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0), backgroundColor: color === '#FFFFFF' ? '#F3F6FB' : color + '15' }]}>
+    <View style={[styles.safeArea, { paddingTop: insets.top, backgroundColor: color === '#FFFFFF' ? '#F3F6FB' : color + '15' }]}>
       <StatusBar barStyle="dark-content" />
 
       {/* Floating Glass Top Bar */}
@@ -652,7 +654,7 @@ export default function NoteEditorScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: scrollPad }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >

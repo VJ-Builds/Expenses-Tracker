@@ -8,6 +8,7 @@ import { Settings2, ChevronDown, Plus, PiggyBank } from 'lucide-react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { FONTS, SPACING, RADIUS, SHADOWS } from '../constants/theme';
+import { useBottomSpace, FAB_GAP } from '../constants/layout';
 import { getCategoryBudgets, getCategoryTotals, getCategoriesForUser, getMonthlyTotal, getMonthlyBudget } from '../db/queries';
 import { formatINR, currentMonthStart, todayISO, currentMonthKey } from '../utils/dateHelpers';
 import { syncUp } from '../utils/syncManager';
@@ -44,6 +45,10 @@ export default function BudgetOverviewScreen() {
   const { user } = useAuth();
   const { colors } = useTheme();
   const navigation = useNavigation();
+  // Tab-bar-aware spacing so scroll content and the FAB clear the bottom nav
+  // on every device (gesture or button navigation).
+  const scrollPad = useBottomSpace({ tabBar: true, extra: 90 });
+  const fabBottom = useBottomSpace({ tabBar: true, extra: FAB_GAP });
 
   const [categories, setCategories] = useState([]);
   const [categoryTotals, setCategoryTotals] = useState({});
@@ -264,7 +269,7 @@ export default function BudgetOverviewScreen() {
       <AnimatedBackground />
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: scrollPad }]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={BRAND_PURPLE} />}
         showsVerticalScrollIndicator={false}
       >
@@ -467,7 +472,7 @@ export default function BudgetOverviewScreen() {
       </ScrollView>
 
       {/* Floating Action Button */}
-      <Animated.View style={[styles.fab, animatedFabStyle]}>
+      <Animated.View style={[styles.fab, { bottom: fabBottom }, animatedFabStyle]}>
         <LinearGradient colors={['#FF6B6B', '#FF8E53']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
           <TouchableOpacity style={[{flex:1, alignItems:'center', justifyContent:'center'}]} onPress={() => navigation.navigate('BudgetSettings', { selectedMonth })}>
             <Settings2 stroke="#FFF" size={24} />
@@ -566,7 +571,7 @@ const styles = StyleSheet.create({
   },
   monthSelectorText: { fontFamily: FONTS.semiBold, fontSize: FONTS.sizes.sm, color: TEXT_DARK },
 
-  content: { paddingHorizontal: 20, paddingBottom: 100 },
+  content: { paddingHorizontal: 20 },
 
   // Exceeded Alert Card
   alertCard: {

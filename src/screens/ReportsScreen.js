@@ -6,6 +6,7 @@ import { PieChart, LineChart } from 'react-native-gifted-charts';
 import { Calendar, ChevronLeft, ChevronRight, BarChart2, PieChart as PieChartIcon } from 'lucide-react-native';
 
 import { FONTS, SHADOWS, RADIUS } from '../constants/theme';
+import { useBottomSpace } from '../constants/layout';
 import { useAuth } from '../context/AuthContext';
 import { getExpenses, getCategoryTotals, getDailyTotals, getMonthlyTotals } from '../db/queries';
 import { formatINR, todayISO, lastNDays, currentMonthStart, currentMonthEnd, currentYearStart } from '../utils/dateHelpers';
@@ -40,6 +41,8 @@ const PIE_COLORS = ['#FF6B6B', '#FF8E53', '#F59E0B', '#10B981', '#4B5563', '#EF4
 
 export default function ReportsScreen({ navigation }) {
   const { user } = useAuth();
+  // Clear the bottom tab bar on every device (gesture or button nav).
+  const scrollPad = useBottomSpace({ tabBar: true, extra: 24 });
   const [activeTab, setActiveTab] = useState('Monthly');
   const [monthKey, setMonthKey] = useState(getCurrentMonthKey());
 
@@ -143,7 +146,7 @@ export default function ReportsScreen({ navigation }) {
         ))}
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: scrollPad }]} showsVerticalScrollIndicator={false}>
 
         {/* Month/Year Selector (only for Monthly and Yearly) */}
         {(activeTab === 'Monthly' || activeTab === 'Yearly') && (
@@ -269,7 +272,7 @@ const styles = StyleSheet.create({
   segmentText: { fontFamily: FONTS.semiBold, fontSize: 12, color: TEXT_MUTED },
   segmentTextActive: { color: BRAND_PURPLE, fontFamily: FONTS.bold },
 
-  content: { paddingHorizontal: 20, paddingBottom: 100 },
+  content: { paddingHorizontal: 20 },
 
   monthRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',

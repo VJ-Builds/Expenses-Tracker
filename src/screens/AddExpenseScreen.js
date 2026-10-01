@@ -3,9 +3,10 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, Alert, ActivityIndicator,
   Animated, Easing as RNEasing, FlatList, Modal,
-  Keyboard, Dimensions,
+  Keyboard, Dimensions, ScrollView,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useBottomSpace, FOOTER_BTN_HEIGHT, FAB_GAP } from '../constants/layout';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ArrowLeft, ChevronDown, Check, Calendar, FileText, Tag, Plus } from 'lucide-react-native';
@@ -264,7 +265,11 @@ function Dropdown({ label, value, items, onChange, placeholder, leftIcon, onAddN
 export default function AddExpenseScreen({ navigation, route }) {
   const { user } = useAuth();
   const { addNotification } = useNotifications();
-  const insets = useSafeAreaInsets();
+
+  // Resting gap above the system navigation bar (gesture OR button nav) for the
+  // floating Save button, plus the scroll padding needed to clear it.
+  const restingBottom = useBottomSpace({ extra: FAB_GAP });
+  const scrollBottomPad = restingBottom + FOOTER_BTN_HEIGHT + 24;
 
   const editing = route.params?.expense || null;
   const isEditing = !!editing;
@@ -291,7 +296,7 @@ export default function AddExpenseScreen({ navigation, route }) {
   const [showDate, setShowDate] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const btnBottom = useRef(new Animated.Value(insets.bottom + 20)).current;
+  const btnBottom = useRef(new Animated.Value(restingBottom)).current;
 
   useEffect(() => {
     const showSub = Keyboard.addListener(
@@ -309,14 +314,14 @@ export default function AddExpenseScreen({ navigation, route }) {
       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
       () => {
         Animated.spring(btnBottom, {
-          toValue: insets.bottom + 20,
+          toValue: restingBottom,
           useNativeDriver: false,
           tension: 80, friction: 10,
         }).start();
       }
     );
     return () => { showSub.remove(); hideSub.remove(); };
-  }, [insets.bottom]);
+  }, [restingBottom]);
 
   const [payItems, setPayItems] = useState([]);
 
@@ -433,6 +438,12 @@ export default function AddExpenseScreen({ navigation, route }) {
             <View style={{ width: 38 }} />
           </View>
 
+          <ScrollView
+            style={styles.flex}
+            contentContainerStyle={{ paddingBottom: scrollBottomPad }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
           {/* ── Amount Hero ── */}
           <View style={styles.amountHero}>
             <Text style={styles.amountHint}>Total Amount</Text>
@@ -455,8 +466,8 @@ export default function AddExpenseScreen({ navigation, route }) {
           </View>
 
           {/* ── Form Card ── */}
-          {/* paddingBottom makes sure rows aren't hidden behind floating button */}
-          <View style={[styles.card, { marginBottom: BTN_H + 40 + insets.bottom }]}>
+          {/* Scroll padding (scrollBottomPad) keeps rows clear of the floating button */}
+          <View style={styles.card}>
 
             {/* Category */}
             <Dropdown
@@ -528,6 +539,7 @@ export default function AddExpenseScreen({ navigation, route }) {
             </View>
 
           </View>
+          </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
 

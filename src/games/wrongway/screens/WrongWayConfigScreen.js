@@ -29,8 +29,8 @@ import {
   Dices,
 } from 'lucide-react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONTS } from '../../../constants/theme';
+import { useSafeInsets } from '../../../constants/layout';
 import {
   MAP_TYPES,
   DUEL_SIZES,
@@ -149,7 +149,7 @@ const MiniMapPreview = ({ rows, cols, walls = [], darkMode = true }) => {
 export default function WrongWayConfigScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const insets = useSafeAreaInsets();
+  const insets = useSafeInsets();
 
   const isVsBot = route.params?.isVsBot ?? true;
 
@@ -228,7 +228,7 @@ export default function WrongWayConfigScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0) }]}>
+    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: insets.top }]}>
       <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} />
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 32 }]}

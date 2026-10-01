@@ -7,7 +7,6 @@ import {
   FlatList,
   TextInput,
   StatusBar,
-  Platform,
   Alert,
   Modal,
   RefreshControl,
@@ -29,9 +28,10 @@ import {
   Lock,
 } from 'lucide-react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { FONTS } from '../../constants/theme';
+import { useSafeInsets, useBottomSpace, FAB_SIZE, FAB_GAP } from '../../constants/layout';
+import Fab from '../../components/layout/Fab';
 import {
   getNotes,
   getFolders,
@@ -52,7 +52,9 @@ import { syncUp, syncDown } from '../../utils/syncManager';
 export default function NotesListScreen() {
   const navigation = useNavigation();
   const { user } = useAuth();
-  const insets = useSafeAreaInsets();
+  const insets = useSafeInsets();
+  // Pad the list so the last cards clear the floating + button on every device.
+  const listBottomPad = useBottomSpace({ extra: FAB_SIZE + FAB_GAP });
 
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState(['All', 'General', 'Work', 'Personal', 'Ideas', 'Finance']);
@@ -253,7 +255,7 @@ export default function NotesListScreen() {
   };
 
   return (
-    <View style={[styles.safeArea, { paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0) }]}>
+    <View style={[styles.safeArea, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" />
 
       {/* Ambient background glowing orbs */}
@@ -430,7 +432,7 @@ export default function NotesListScreen() {
         key={isGridView && !isTrashView ? 'GRID' : 'LIST'}
         numColumns={isGridView && !isTrashView ? 2 : 1}
         columnWrapperStyle={isGridView && !isTrashView ? styles.gridRow : null}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: listBottomPad }]}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item.id}
         refreshControl={
@@ -552,15 +554,9 @@ export default function NotesListScreen() {
 
       {/* Floating Action Capture Button (FAB) - Single + button */}
       {!isTrashView && (
-        <View style={styles.fabContainer}>
-          <TouchableOpacity
-            style={[styles.fabBtn, styles.fabPrimary]}
-            onPress={() => handleCreateNew('text')}
-            activeOpacity={0.85}
-          >
-            <Plus stroke="#FFFFFF" size={26} strokeWidth={2.4} />
-          </TouchableOpacity>
-        </View>
+        <Fab onPress={() => handleCreateNew('text')} color="#2563EB">
+          <Plus stroke="#FFFFFF" size={26} strokeWidth={2.4} />
+        </Fab>
       )}
 
       {/* New Folder Modal */}
@@ -884,7 +880,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 20,
-    paddingBottom: 120,
   },
   gridRow: {
     justifyContent: 'space-between',
@@ -939,36 +934,6 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.bold,
     fontSize: 14,
     color: '#FFFFFF',
-  },
-  fabContainer: {
-    position: 'absolute',
-    bottom: Platform.OS === 'android' ? 24 : 36,
-    right: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  fabBtn: {
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  fabPrimary: {
-    width: 58,
-    height: 58,
-    backgroundColor: '#2563EB',
-  },
-  fabSecondary: {
-    width: 46,
-    height: 46,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
   },
   modalOverlay: {
     flex: 1,

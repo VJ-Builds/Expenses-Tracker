@@ -7,7 +7,6 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
   StyleSheet,
-  Platform,
 } from 'react-native';
 import { X, Check, Type, RotateCcw } from 'lucide-react-native';
 import {
@@ -15,6 +14,7 @@ import {
   DEFAULT_FONT_FAMILY,
   getNoteFontFamily,
 } from '../constants/typography';
+import { useSafeInsets } from '../../constants/layout';
 
 export default function TypographyModal({
   visible,
@@ -23,6 +23,7 @@ export default function TypographyModal({
   onChangeFontFamily,
 }) {
   const currentFont = fontFamily || DEFAULT_FONT_FAMILY;
+  const insets = useSafeInsets();
 
   const handleReset = () => {
     onChangeFontFamily(DEFAULT_FONT_FAMILY);
@@ -38,7 +39,7 @@ export default function TypographyModal({
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <View style={styles.sheetContainer}>
+            <View style={[styles.sheetContainer, { paddingBottom: 16 + insets.bottom }]}>
               {/* Top Drag Indicator */}
               <View style={styles.dragIndicator} />
 
@@ -185,7 +186,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 28,
     maxHeight: '85%',
     paddingTop: 10,
-    paddingBottom: Platform.OS === 'android' ? 16 : 28,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.15,

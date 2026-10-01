@@ -8,6 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Plus, Receipt, ChevronDown, Check } from 'lucide-react-native';
 
 import { FONTS } from '../constants/theme';
+import { useBottomSpace } from '../constants/layout';
 import { useAuth } from '../context/AuthContext';
 import { getExpenses, getMonthlyTotal, getCategoryTotals, getMonthlyBudget } from '../db/queries';
 import ExpenseCard from '../components/ExpenseCard';
@@ -37,6 +38,8 @@ const generateMonthOptions = () => {
 
 export default function DashboardScreen({ navigation }) {
   const { user, resendVerification, checkVerificationStatus } = useAuth();
+  // Clear the bottom tab bar on every device (gesture or button nav).
+  const scrollPad = useBottomSpace({ tabBar: true, extra: 24 });
   const [resending, setResending] = useState(false);
   const [checking, setChecking] = useState(false);
   const [verifyModalVisible, setVerifyModalVisible] = useState(false);
@@ -297,7 +300,7 @@ export default function DashboardScreen({ navigation }) {
       <AnimatedBackground />
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: scrollPad }]}
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled={true}
         onScrollBeginDrag={() => setMonthDropOpen(false)}
@@ -594,7 +597,7 @@ const softShadow = {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: 'transparent' },
-  scrollContent: { paddingBottom: 100 },
+  scrollContent: {},
 
   header: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',

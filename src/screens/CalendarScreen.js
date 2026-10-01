@@ -6,6 +6,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useBottomSpace } from '../constants/layout';
 import { FONTS, SPACING, RADIUS } from '../constants/theme';
 import { getExpenses, getDailyTotals } from '../db/queries';
 import { formatINR, todayISO } from '../utils/dateHelpers';
@@ -15,6 +16,7 @@ export default function CalendarScreen() {
   const { user } = useAuth();
   const { colors, isDarkMode } = useTheme();
   const navigation = useNavigation();
+  const listPad = useBottomSpace({ extra: 24 });
 
   const [selectedDate, setSelectedDate] = useState(todayISO());
   const [currentMonth, setCurrentMonth] = useState(todayISO().substring(0, 7)); // YYYY-MM
@@ -141,7 +143,7 @@ export default function CalendarScreen() {
             <Text style={[styles.emptySub, { color: colors.textSecondary }]}>You didn't spend anything on this day.</Text>
           </View>
         }
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: listPad }]}
       />
     </SafeAreaView>
   );

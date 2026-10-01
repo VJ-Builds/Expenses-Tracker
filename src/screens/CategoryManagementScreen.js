@@ -33,6 +33,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { useAuth } from '../context/AuthContext';
 import { FONTS, RADIUS, SHADOWS } from '../constants/theme';
+import { useBottomSpace } from '../constants/layout';
 import {
   getCategoriesWithStats,
   addCategory,
@@ -182,6 +183,7 @@ function ReorderableCard({
 export default function CategoryManagementScreen() {
   const { user } = useAuth();
   const navigation = useNavigation();
+  const listPad = useBottomSpace({ extra: 24 });
 
   const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -508,7 +510,7 @@ export default function CategoryManagementScreen() {
       ) : (
         <ScrollView
           scrollEnabled={draggingIndex === null}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: listPad }]}
           showsVerticalScrollIndicator={false}
         >
           {searchQuery.trim().length > 0 ? (

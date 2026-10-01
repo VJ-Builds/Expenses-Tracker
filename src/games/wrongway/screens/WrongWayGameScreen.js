@@ -26,8 +26,8 @@ import {
   Sun,
 } from 'lucide-react-native';
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONTS } from '../../../constants/theme';
+import { useSafeInsets } from '../../../constants/layout';
 import {
   MAP_TYPES,
   DUEL_SIZES,
@@ -74,7 +74,7 @@ export default function WrongWayGameScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const isFocused = useIsFocused();
-  const insets = useSafeAreaInsets();
+  const insets = useSafeInsets();
 
   const {
     isVsBot = true,
@@ -628,7 +628,7 @@ export default function WrongWayGameScreen() {
         styles.container,
         {
           backgroundColor: theme.bg,
-          paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 8),
+          paddingTop: Math.max(insets.top, 8),
           paddingBottom: Math.max(insets.bottom, 16),
         },
       ]}

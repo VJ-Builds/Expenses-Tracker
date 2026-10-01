@@ -24,8 +24,8 @@ import {
   Zap,
 } from 'lucide-react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONTS } from '../../../constants/theme';
+import { useSafeInsets } from '../../../constants/layout';
 import {
   THEME,
   getRankTier,
@@ -44,7 +44,7 @@ import ReplayViewerModal from '../components/ReplayViewerModal';
 export default function WrongWayStatsScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const insets = useSafeAreaInsets();
+  const insets = useSafeInsets();
   const [darkMode, setDarkMode] = useState(true);
   const theme = darkMode ? THEME.dark : THEME.light;
 
@@ -87,7 +87,7 @@ export default function WrongWayStatsScreen() {
   const winRate = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0) }]}>
+    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: insets.top }]}>
       <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} />
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 32 }]}

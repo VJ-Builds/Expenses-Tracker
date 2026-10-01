@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, LayoutAnimation, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useBottomSpace } from '../constants/layout';
 import { ArrowLeft, Bell, CheckCircle2, AlertTriangle, Info, Star } from 'lucide-react-native';
 
 import { FONTS, RADIUS, SHADOWS } from '../constants/theme';
@@ -14,6 +15,7 @@ const BRAND_PURPLE = '#FF6B6B'; // Sunset Horizon Primary
 
 export default function NotificationsScreen() {
   const navigation = useNavigation();
+  const scrollPad = useBottomSpace({ extra: 24 });
   const { notifications, markAllAsRead, unreadCount } = useNotifications();
 
   // Mark all as read when opening the screen (or they can click a button)
@@ -60,7 +62,7 @@ export default function NotificationsScreen() {
         )}
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: scrollPad }]} showsVerticalScrollIndicator={false}>
         {notifications.length === 0 ? (
           <View style={styles.emptyWrap}>
             <View style={styles.emptyIconWrap}>

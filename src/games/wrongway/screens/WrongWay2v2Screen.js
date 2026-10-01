@@ -26,8 +26,8 @@ import {
   Sun,
 } from 'lucide-react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONTS } from '../../../constants/theme';
+import { useSafeInsets } from '../../../constants/layout';
 import {
   MAP_TYPES,
   BOARD_DIMENSIONS,
@@ -50,7 +50,7 @@ import FallingGlitters from '../components/FallingGlitters';
 export default function WrongWay2v2Screen() {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const insets = useSafeAreaInsets();
+  const insets = useSafeInsets();
   const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
@@ -203,7 +203,7 @@ export default function WrongWay2v2Screen() {
         styles.container,
         {
           backgroundColor: theme.bg,
-          paddingTop: Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 8),
+          paddingTop: Math.max(insets.top, 8),
           paddingBottom: Math.max(insets.bottom, 16),
         },
       ]}

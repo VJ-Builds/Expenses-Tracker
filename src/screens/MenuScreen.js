@@ -9,6 +9,7 @@ import {
 } from 'lucide-react-native';
 import { useAuth } from '../context/AuthContext';
 import { FONTS, SHADOWS, RADIUS } from '../constants/theme';
+import { useSafeInsets, useBottomSpace } from '../constants/layout';
 import { exportUserDataBackup, importUserDataBackup } from '../utils/backupHelpers';
 import { syncUp, syncDown } from '../utils/syncManager';
 import { getDb } from '../db/schema';
@@ -35,6 +36,8 @@ const MenuRow = ({ icon: Icon, iconColor, label, onPress, rightElement }) => (
 export default function MenuScreen() {
   const { user, logout, resendVerification, checkVerificationStatus } = useAuth();
   const navigation = useNavigation();
+  const insets = useSafeInsets();
+  const scrollPad = useBottomSpace({ extra: 24 });
   const [syncing, setSyncing] = useState(false);
   const [resending, setResending] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -129,8 +132,8 @@ export default function MenuScreen() {
   };
 
   return (
-    <View style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <View style={[styles.safeArea, { paddingTop: insets.top }]}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: scrollPad }]} showsVerticalScrollIndicator={false}>
 
         {/* Profile Card */}
         <View style={styles.profileCard}>

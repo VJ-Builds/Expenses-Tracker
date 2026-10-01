@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { FileText, Image as ImageIcon, File, X, Download, CheckSquare, ArrowLeft, Layers } from 'lucide-react-native';
 import { FONTS } from '../../constants/theme';
+import { useSafeInsets } from '../../constants/layout';
 import { exportNoteAsPdf, exportNoteAsTxt, exportNoteAsImage } from '../utils/noteExportHelpers';
 
 export default function ExportModal({
@@ -13,6 +14,7 @@ export default function ExportModal({
   offScreenTextRef,
   offScreenChecklistRef,
 }) {
+  const insets = useSafeInsets();
   const [loadingType, setLoadingType] = useState(null);
   const [imageSubMenu, setImageSubMenu] = useState(false);
 
@@ -89,7 +91,7 @@ export default function ExportModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
+      <View style={[styles.overlay, { paddingBottom: 16 + insets.bottom }]}>
         <View style={styles.glassContainer}>
           {imageSubMenu ? (
             /* Sub-Menu: Choose Image Content (Merged Option A + C) */
