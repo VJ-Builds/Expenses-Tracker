@@ -39,7 +39,7 @@ import WrongWayConfigScreen    from '../games/wrongway/screens/WrongWayConfigScr
 import WrongWayGameScreen      from '../games/wrongway/screens/WrongWayGameScreen';
 import WrongWay2v2Screen       from '../games/wrongway/screens/WrongWay2v2Screen';
 import WrongWayStatsScreen     from '../games/wrongway/screens/WrongWayStatsScreen';
-
+import MeowdokuScreen from '../games/meowdoku/MeowdokuScreen';
 const Stack = createStackNavigator();
 const Tab   = createBottomTabNavigator();
 
@@ -370,6 +370,7 @@ const AppNavigator = () => {
             <Stack.Screen name="WrongWayGame" component={WrongWayGameScreen} />
             <Stack.Screen name="WrongWay2v2" component={WrongWay2v2Screen} />
             <Stack.Screen name="WrongWayStats" component={WrongWayStatsScreen} />
+          <Stack.Screen name="MeowdokuGame" component={MeowdokuScreen} options={{ headerShown: false }} />
             <Stack.Screen name="Main" component={MainTabs} />
             <Stack.Screen name="NotesList" component={NotesListScreen} />
             <Stack.Screen name="NoteEditor" component={NoteEditorScreen} />
