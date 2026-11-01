@@ -19,6 +19,21 @@ export const GAMES_LIST = [
     route: 'WrongWayMenu',
   },
   {
+    id: 'meowdoku',
+    title: 'Meowdoku',
+    subtitle: 'Cat Logic Grid',
+    description: 'Place 1 aloof cat per row, column, and color region without any cats touching!',
+    icon: 'Cat',
+    iconName: 'Cat',
+    color: '#A96E44',
+    bgColor: '#FAF4EE',
+    category: 'Puzzle',
+    badge: 'HOT 🐱',
+    status: 'playable',
+    route: 'MeowdokuGame',
+  },
+  {
+  {
     id: 'tictactoe',
     title: 'Tic Tac Toe',
     subtitle: 'Classic X & O',
