@@ -21,6 +21,7 @@ import {
   Flag,
   Play,
   Swords,
+  Cat,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -53,6 +54,7 @@ export default function GamesHubScreen() {
         return <Flag {...props} />;
       case 'Swords':
         return <Swords {...props} />;
+      case 'Cat': return <Cat {...props} />;
       default:
         return <Gamepad2 {...props} />;
     }
