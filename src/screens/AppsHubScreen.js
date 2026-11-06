@@ -20,7 +20,7 @@ import {
   Bell,
   Settings,
   User as UserIcon,
-  Gamepad2,
+  Gamepad2 Globe,,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -178,7 +178,7 @@ export default function AppsHubScreen() {
                 </View>
               </View>
             </TouchableOpacity>
-
+<TouchableOpacity style={[styles.appCard, styles.cardNotepad]} onPress={() => navigation.navigate('LiveNotepad')} activeOpacity={0.85}><View style={styles.cardHeader}><View style={[styles.appIconWrap, { backgroundColor: '#0EA5E9' }]}><Globe stroke="#FFFFFF" size={24} strokeWidth={2.2} /></View><View style={[styles.badgePill, { backgroundColor: '#E0F2FE' }]}><Text style={[styles.badgeText, { color: '#0EA5E9' }]}>Live Sync</Text></View></View><Text style={styles.cardTitle}>Notepad.pw Chat</Text><Text style={styles.cardDesc}>Share a room code like 1234 to type, chat, and sync notes in real time.</Text><View style={styles.cardFooter}><View style={styles.arrowWrap}><ChevronRight stroke="#0EA5E9" size={18} strokeWidth={2.5} /></View></View></TouchableOpacity>
             {/* Card 4: Add New App */}
             <TouchableOpacity
               style={[styles.appCard, styles.cardAdd]}
